@@ -30,6 +30,14 @@ nav ul a:hover{color:var(--amber)} nav.solid ul a:hover,nav.scrolled ul a:hover{
 nav ul a.active{border-bottom-color:var(--amber);color:var(--amber)}
 nav.solid ul a.active,nav.scrolled ul a.active{color:var(--blue);border-bottom-color:var(--blue)}
 
+/* hamburger (mobile/tablet nav) */
+.navtoggle{display:none;background:none;border:none;cursor:pointer;padding:.4rem;z-index:110}
+.navtoggle span{display:block;width:24px;height:2.5px;background:#fff;margin:5px 0;border-radius:2px;transition:.3s}
+nav.solid .navtoggle span,nav.scrolled .navtoggle span{background:var(--blue-d)}
+nav.open .navtoggle span:nth-child(1){transform:translateY(7.5px) rotate(45deg)}
+nav.open .navtoggle span:nth-child(2){opacity:0}
+nav.open .navtoggle span:nth-child(3){transform:translateY(-7.5px) rotate(-45deg)}
+
 /* PAGE HEADER (subpages) */
 .pagehead{background:linear-gradient(120deg,var(--navy),var(--blue) 62%,var(--teal));color:#fff;
  padding:9.5rem 0 4.5rem;position:relative;overflow:hidden}
@@ -187,5 +195,86 @@ footer h4{color:#fff;margin-bottom:1rem}
 footer a{display:block;color:#B9CEE3;text-decoration:none;font-size:.9rem;margin-bottom:.55rem}
 footer a:hover{color:#fff}
 footer .fine{margin-top:2.8rem;padding-top:1.4rem;border-top:1px solid rgba(255,255,255,.14);font-size:.8rem}
-@media(max-width:920px){.grid2{grid-template-columns:1fr}.tiers{grid-template-columns:1fr}
- footer .cols{grid-template-columns:1fr 1fr}nav ul{gap:.9rem}nav ul li:nth-child(-n+3){display:none}}
+/* ══════════════════ RESPONSIVE ══════════════════ */
+
+/* Tablet & small laptop */
+@media(max-width:1020px){
+ .wrap{padding:0 1.5rem}
+ section{padding:4.2rem 0}
+ .grid2{grid-template-columns:1fr;gap:1.6rem}
+ .grid3{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+ .tiers{grid-template-columns:1fr;gap:1.3rem}
+ footer .cols{grid-template-columns:1fr 1fr;gap:2.2rem}
+ #wWrap{grid-template-columns:1fr!important}
+ #fWrap{grid-template-columns:1fr!important}
+}
+
+/* Phones & small tablets — hamburger kicks in */
+@media(max-width:760px){
+ .wrap{padding:0 1.2rem}
+ section{padding:3.2rem 0}
+ .navtoggle{display:block}
+ nav ul{position:fixed;top:0;right:0;height:100vh;width:min(78vw,320px);flex-direction:column;
+  align-items:flex-start;justify-content:flex-start;gap:.2rem;background:#fff;
+  padding:5.5rem 1.6rem 2rem;box-shadow:-8px 0 40px rgba(19,32,46,.18);
+  transform:translateX(100%);transition:.4s var(--ease)}
+ nav.open ul{transform:translateX(0)}
+ nav ul li{width:100%}
+ nav ul a{display:block;width:100%;padding:.85rem 0;color:var(--ink)!important;font-size:1rem;
+  border-bottom:1px solid #EEF2F6!important}
+ /* when menu is open, the top bar itself goes solid so logo+hamburger stay readable
+    over any hero background */
+ nav.open .bar{background:rgba(255,255,255,.96);backdrop-filter:blur(18px)}
+ nav.open .logo{color:var(--blue-d)}
+ nav.open .navtoggle span{background:var(--blue-d)}
+ nav.open::after{content:'';position:fixed;inset:0;background:rgba(8,42,71,.35);z-index:-1;
+  animation:fadein .3s}
+ @keyframes fadein{from{opacity:0}to{opacity:1}}
+
+ /* hero & headers */
+ .hero{min-height:92svh}
+ .hero-inner{padding:0 1.4rem}
+ .hero p{margin:1.1rem auto 1.8rem}
+ .btns{display:flex;flex-direction:column;gap:.8rem;align-items:center}
+ .btn-ghost{margin-left:0}
+ .pagehead{padding:7.5rem 0 3rem}
+
+ /* stats & kpis stack cleanly */
+ .stats{grid-template-columns:1fr 1fr;gap:1.6rem}
+ .stat .num{font-size:2.5rem}
+ .kgrid{grid-template-columns:1fr 1fr;gap:.9rem}
+ .kpi{padding:1rem 1.1rem}
+
+ /* cards & charts breathe, don't crush */
+ .card{padding:1.3rem 1.2rem;border-radius:14px}
+ .chartbox{padding:1.2rem}
+ .grid3{grid-template-columns:1fr}
+ .feature .art{height:140px;font-size:2.6rem}
+
+ /* forms stack instead of squeezing */
+ .card > div[style*="flex"]{flex-direction:column;align-items:stretch!important}
+ select,input[type=text]{width:100%}
+ #fWrap, #wWrap{grid-template-columns:1fr!important;gap:1.2rem!important}
+ #wSliders{grid-template-columns:1fr!important}
+
+ /* tables scroll horizontally instead of squashing */
+ .tablewrap{max-height:60vh}
+ table{font-size:.85rem}
+ th,td{padding:.65rem .7rem}
+
+ /* video/resource grids single column */
+ .vids,.res{grid-template-columns:1fr}
+
+ /* photo bands shorter on phones */
+ .band{min-height:38vh;padding:3.5rem 1.4rem}
+
+ footer{padding:3rem 0 2rem}
+ footer .cols{grid-template-columns:1fr;gap:2rem}
+}
+
+/* Very small phones */
+@media(max-width:400px){
+ .hero h1{font-size:2.1rem}
+ .stats{grid-template-columns:1fr}
+ .kgrid{grid-template-columns:1fr}
+}

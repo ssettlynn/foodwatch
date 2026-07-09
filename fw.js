@@ -17,7 +17,9 @@ function fwNav(active,solid){
  const items=[['index.html','Home'],['explore.html','World & Patterns'],['country.html','Country Story'],
   ['forecast.html','Forecast 2024'],['lab.html','What-If Lab'],['learn.html','Learn']];
  document.write(`<div id="progress"></div><nav class="${solid?'solid':''}"><div class="bar">
-  <a class="logo" href="index.html">🌾 FoodWatch</a><ul>`+
+  <a class="logo" href="index.html">🌾 FoodWatch</a>
+  <button class="navtoggle" id="navToggle" aria-label="Menu"><span></span><span></span><span></span></button>
+  <ul>`+
   items.map(([h,t])=>`<li><a href="${h}" class="${h===active?'active':''}">${t}</a></li>`).join('')+
   `</ul></div></nav>`);}
 
@@ -38,6 +40,9 @@ function fwFooter(){document.write(`<footer><div class="wrap"><div class="cols">
 
 addEventListener('DOMContentLoaded',()=>{
  const nav=document.querySelector('nav'),bar=document.getElementById('progress');
+ const toggle=document.getElementById('navToggle');
+ if(toggle) toggle.addEventListener('click',()=>nav.classList.toggle('open'));
+ nav?.querySelectorAll('ul a').forEach(a=>a.addEventListener('click',()=>nav.classList.remove('open')));
  addEventListener('scroll',()=>{
   if(nav&&!nav.classList.contains('solid'))nav.classList.toggle('scrolled',scrollY>40);
   if(bar)bar.style.width=(scrollY/Math.max(1,document.body.scrollHeight-innerHeight)*100)+'%';
