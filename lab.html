@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>What-If Lab — FoodWatch</title>
+<link rel="stylesheet" href="style.css">
+<script src="plotly.min.js"></script>
+<script src="foodwatch_data.js"></script>
+<script src="fw.js"></script>
+</head>
+<body>
+<script>fwNav('lab.html',false)</script>
+
+<div class="pagehead">
+  <div class="wrap">
+    <div class="eyebrow" style="color:#FFD86B">Play With The Model</div>
+    <h1>🧪 The What-If Lab</h1>
+    <p>A real model, live in your browser. Start from a country's true 2023 situation,
+       drag the sliders, and watch its 2024 outlook change instantly.
+       Try it: give a struggling country strong growth and low inflation — does its risk fall?</p>
+  </div>
+</div>
+
+<section>
+  <div class="wrap">
+    <div class="card rv">
+      <div style="display:flex;gap:1.2rem;flex-wrap:wrap">
+        <select id="wCountry" style="min-width:260px"></select>
+        <button class="chip" id="wReset">↺ Reset to real values</button>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:0 2.6rem" id="wSliders"></div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:300px 1fr;gap:2rem;margin-top:2rem;align-items:center" id="wWrap">
+      <div class="card rv" style="text-align:center" id="wResult"></div>
+      <div class="card rv d1"><div id="wProbs" style="height:200px"></div></div>
+    </div>
+    <div class="explain rv d2">⚠️ Educational scenario tool — a live Logistic Regression (our best model,
+      macro-F1 0.963) computed entirely in your browser. Real forecasts use verified data, not manual inputs.</div>
+  </div>
+</section>
+
+<script>fwFooter()</script>
+<script>
+const LR=FW.LOGREG,WFEAT=LR.features;
+const wSel=document.getElementById('wCountry');
+ISOs.filter(i=>FW.PRED[i]).map(i=>FW.META[i].n).sort().forEach(n=>{
+ const o=document.createElement('option');o.value=n;o.textContent=n;wSel.appendChild(o);});
+wSel.value='Kenya';
+const RANGES={pou:[0,80],des_adequacy:[60,170],cereal_import_dep:[-100,100],food_prod_var:[0,200],
+ gdp_per_capita:[200,60000],gdp_growth:[-20,20],inflation_cpi:[-5,100],pop_growth:[-3,6],pou_change:[-5,5]};
+function baseVals(){const iso=name2iso[wSel.value],s=FW.SERIES[iso],i=s.y.indexOf(2023),v={};
+ WFEAT.forEach((f,fi)=>{if(f==='covid_flag'){v[f]=0;return}
+  if(f==='pou_change'){const j=s.y.indexOf(2022);
+   v[f]=(i>-1&&j>-1&&s.pou[i]!=null&&s.pou[j]!=null)?+(s.pou[i]-s.pou[j]).toFixed(2):LR.medians[fi];return}
+  v[f]=(i>-1&&s[f]&&s[f][i]!=null)?s[f][i]:LR.medians[fi];});return v;}
+function buildSliders(){const v=baseVals(),wrap=document.getElementById('wSliders');wrap.innerHTML='';
+ Object.keys(RANGES).forEach(f=>{const[lo,hi]=RANGES[f],val=Math.min(Math.max(v[f],lo),hi);
+  wrap.insertAdjacentHTML('beforeend',
+   `<div><div class="sliderlab"><span>${LBL[f]}</span><b id="v_${f}">${(+val).toFixed(1)}</b></div>
+    <input type="range" id="s_${f}" min="${lo}" max="${hi}" step="${(hi-lo)/200}" value="${val}" style="width:100%">
+   </div>`);});
+ Object.keys(RANGES).forEach(f=>{document.getElementById('s_'+f).oninput=e=>{
+  document.getElementById('v_'+f).textContent=(+e.target.value).toFixed(1);predictWF();};});
+ predictWF();}
+function predictWF(){const x=WFEAT.map(f=>f==='covid_flag'?0:+document.getElementById('s_'+f).value);
+ const z=x.map((v,i)=>(v-LR.mean[i])/LR.scale[i]);
+ const sc=LR.coef.map((row,c)=>row.reduce((a,w,i)=>a+w*z[i],LR.intercept[c]));
+ const mx=Math.max(...sc),ex=sc.map(s=>Math.exp(s-mx)),sum=ex.reduce((a,b)=>a+b,0),pr=ex.map(e=>e/sum);
+ const best=LR.classes[pr.indexOf(Math.max(...pr))];
+ const realP=FW.PRED[name2iso[wSel.value]],real=realP?realP.lr.t:'?';
+ document.getElementById('wResult').innerHTML=
+  `<div style="font-size:.74rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">Your scenario → 2024</div>
+   <div style="font-family:var(--serif);font-size:2.6rem;font-weight:700;color:${TC[best]}">${best}</div>
+   <div style="font-size:.86rem;color:var(--muted);line-height:1.6">${MEAN[best]}<br>${Math.round(Math.max(...pr)*100)}% sure ·
+   ${best===real?'same as the real forecast':'<b style=color:#D64550>changed from the real forecast ('+real+')!</b>'}</div>`;
+ const ord=TIERS.map(t=>pr[LR.classes.indexOf(t)]);
+ Plotly.react('wProbs',[{type:'bar',orientation:'h',y:TIERS,x:ord,
+  marker:{color:TIERS.map(t=>TC[t])},text:ord.map(p=>Math.round(p*100)+'%'),textposition:'outside'}],
+  {...LAYOUT,xaxis:{range:[0,1.15],showgrid:false},margin:{l:76,r:36,t:8,b:24}},PLOTCFG);}
+wSel.onchange=buildSliders;
+document.getElementById('wReset').onclick=buildSliders;
+buildSliders();
+</script>
+</body>
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Country Story — FoodWatch</title>
+<link rel="stylesheet" href="style.css">
+<script src="plotly.min.js"></script>
+<script src="foodwatch_data.js"></script>
+<script src="fw.js"></script>
+</head>
+<body>
+<script>fwNav('country.html',false)</script>
+
+<div class="pagehead">
+  <img class="bgart" src="assets/market.svg" alt="">
+  <div class="wrap">
+    <div class="eyebrow" style="color:#FFD86B">Country Story</div>
+    <h1>Every country tells a story</h1>
+    <p>Fourteen years of data, an auto-written summary, three model forecasts for 2024 —
+       and the reasons behind them.</p>
+  </div>
+</div>
+
+<section>
+  <div class="wrap">
+    <div class="card rv">
+      <div style="display:flex;gap:1.2rem;flex-wrap:wrap;align-items:center">
+        <input type="text" id="cSearch" list="cList" placeholder="🔎 Type a country — try Myanmar, Kenya, Haiti…" style="flex:1;min-width:280px">
+        <datalist id="cList"></datalist>
+        <select id="cMetric"></select>
+      </div>
+      <div id="cStory" style="margin-top:1.6rem"></div>
+      <div id="cChart" style="height:380px;margin-top:1rem"></div>
+      <div id="cStrip" style="margin-top:1.2rem;line-height:2.4"></div>
+    </div>
+
+    <div class="card rv d1" style="margin-top:2rem">
+      <div id="cOutlook"></div>
+    </div>
+  </div>
+</section>
+
+<script>fwFooter()</script>
+<script>
+const dl=document.getElementById('cList');
+ISOs.map(i=>FW.META[i].n).sort().forEach(n=>{const o=document.createElement('option');o.value=n;dl.appendChild(o);});
+const mSel=document.getElementById('cMetric');
+['pou','gdp_per_capita','inflation_cpi','gdp_growth','des_adequacy','cereal_import_dep'].forEach(k=>{
+ const o=document.createElement('option');o.value=k;o.textContent=LBL[k];mSel.appendChild(o);});
+
+function showCountry(name){const iso=name2iso[name];if(!iso)return;
+ const s=FW.SERIES[iso],m=FW.META[iso],k=mSel.value;
+ const first=s.pou.find(v=>v!=null),last=[...s.pou].reverse().find(v=>v!=null);
+ const dir=last<first?'improved':'worsened';
+ let peakY=s.y[0],peak=-1;s.pou.forEach((v,i)=>{if(v!=null&&v>peak){peak=v;peakY=s.y[i]}});
+ const lt=[...s.tier].reverse().find(v=>v);
+ document.getElementById('cStory').innerHTML=
+  `<h2 style="font-size:1.8rem">${m.n} <span class="badge" style="background:${TC[lt]||'#888'};vertical-align:middle">${lt} — ${MEAN[lt]||''}</span></h2>
+   <div class="explain">📖 <b>${m.n}'s story:</b> hunger has <b>${dir}</b> since 2010 (${first}% → ${last}%).
+   Hardest year: <b>${peakY}</b>. Region: ${m.r} (${m.g}).</div>`;
+ const regAvg=FW.GLOB.years.map(y=>{let sum=0,n=0;ISOs.forEach(c=>{if(FW.META[c].r===m.r){
+  const i=FW.SERIES[c].y.indexOf(y);if(i>-1&&FW.SERIES[c][k]&&FW.SERIES[c][k][i]!=null){sum+=FW.SERIES[c][k][i];n++;}}});
+  return n?sum/n:null;});
+ Plotly.react('cChart',[{x:s.y,y:s[k],name:m.n,mode:'lines+markers',line:{color:'#0F5FA8',width:3}},
+  {x:FW.GLOB.years,y:regAvg,name:m.r+' average',line:{color:'#9AA8B5',width:2,dash:'dot'}}],
+  {...LAYOUT,yaxis:{title:LBL[k]},legend:{orientation:'h',y:1.12},
+   shapes:[2020,2022].map(x=>({type:'line',x0:x,x1:x,y0:0,y1:1,yref:'paper',
+    line:{color:TC.High,dash:'dash',width:1}}))},PLOTCFG);
+ document.getElementById('cStrip').innerHTML='<b style="font-size:.9rem">Hunger tier, year by year:</b> '+
+  s.y.map((y,i)=>s.tier[i]?`<span class="badge" style="background:${TC[s.tier[i]]};font-size:.72rem;margin:2px">${y}</span>`:'').join('');
+
+ const P=FW.PRED[iso],T=FW.TREND[iso]||{};
+ let html='<h2 style="font-size:1.5rem;margin-bottom:1.2rem">🔮 2024 Outlook — three models, one verdict</h2>';
+ if(P){html+='<div style="display:flex;gap:1rem;flex-wrap:wrap">';
+  [['rf','🌲 Random Forest'],['lr','📐 Logistic Regression'],['dt','🌳 Decision Tree']].forEach(([kk,nm])=>{
+   const p=P[kk];html+=`<div class="kpi" style="min-width:200px"><div class="l">${nm}</div>
+    <div style="margin-top:.4rem"><span class="badge" style="background:${TC[p.t]}">${p.t}</span>
+    <b style="font-size:.95rem"> ${Math.round(p.c*100)}% sure</b></div></div>`;});
+  html+='</div>';}
+ else html+='<div class="explain">No 2023 data available for a model forecast for this country.</div>';
+ const tl={pou:'Hunger level',gdp_per_capita:'Income per person',inflation_cpi:'Inflation',gdp_growth:'Economic growth'};
+ const tRows=Object.keys(tl).filter(kk=>T[kk]).map(kk=>{const t=T[kk],up=t.d>0,
+  good=(kk==='pou'||kk==='inflation_cpi')?!up:up;
+  return `<div class="kpi" style="min-width:200px"><div class="l">${tl[kk]} — trend</div>
+   <div style="margin-top:.4rem"><b style="color:${good?'#1A9E77':'#D64550'};font-size:1.05rem">${up?'▲ rising':'▼ falling'}</b>
+   <span style="font-size:.85rem;color:var(--muted)"> → ~${t.p}${kk==='gdp_per_capita'?' $':'%'} in 2024</span></div></div>`;}).join('');
+ if(tRows) html+=`<h3 style="font-family:var(--sans);font-size:1rem;margin:1.6rem 0 .8rem">Beyond hunger — where the other signals are heading</h3>
+  <div style="display:flex;gap:1rem;flex-wrap:wrap">${tRows}</div>
+  <div style="font-size:.8rem;color:var(--muted);margin-top:.7rem">Trend arrows are simple 5-year projections (not ML) —
+  direction guides. Colour shows whether the direction is good news.</div>`;
+ const S=FW.SHAP[iso];
+ if(S){const top=[...S].sort((a,b)=>Math.abs(b[1])-Math.abs(a[1])).slice(0,3);
+  html+=`<div class="explain">🧠 <b>Why the model thinks so:</b> `+
+   top.map(([f,v])=>`<b>${LBL[f]}</b> ${v>0?'pushes risk up':'pulls risk down'}`).join(' · ')+'.</div>';}
+ html+=`<div style="margin-top:1.4rem"><a class="btn btn-blue" href="lab.html">🧪 Test scenarios for this country →</a></div>`;
+ document.getElementById('cOutlook').innerHTML=html;}
+document.getElementById('cSearch').addEventListener('change',e=>showCountry(e.target.value));
+mSel.onchange=()=>showCountry(document.getElementById('cSearch').value||'Myanmar');
+document.getElementById('cSearch').value='Myanmar';showCountry('Myanmar');
+</script>
+</body>
+</html>

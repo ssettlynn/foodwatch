@@ -1,0 +1,19 @@
+# environments
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# OS
+.DS_Store
+Thumbs.db
+
+# large / regenerable data (site uses foodwatch_data.js instead)
+dashboard_data/
+data/raw/
+data/interim/
+*.zip
+
+# editors
+.idea/
+.vscode/

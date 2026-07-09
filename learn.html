@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Learn — FoodWatch</title>
+<link rel="stylesheet" href="style.css">
+<script src="foodwatch_data.js"></script>
+<script src="fw.js"></script>
+</head>
+<body>
+<script>fwNav('learn.html',false)</script>
+
+<div class="pagehead">
+  <img class="bgart" src="assets/hero.svg" alt="">
+  <div class="wrap">
+    <div class="eyebrow" style="color:#FFD86B">Learn More</div>
+    <h1>Understand food security</h1>
+    <p>The concepts behind the numbers, official sources, videos from UN agencies —
+       and honest answers about our methods.</p>
+  </div>
+</div>
+
+<section>
+  <div class="wrap">
+    <div class="center rv">
+      <div class="eyebrow">Watch &amp; Understand</div>
+      <h2>From the UN and the world's food agencies</h2>
+      <p>Official channels — each opens on YouTube in a new tab (no broken embeds, ever).</p>
+    </div>
+    <div class="vids">
+      <a class="vid rv" href="https://www.youtube.com/@unitednations/search?query=food%20security" target="_blank"
+         style="background:linear-gradient(135deg,#0B3D6E,#0F5FA8)"><small>UNITED NATIONS</small>
+         <div class="play"></div><b>UN — Food security &amp; SDG 2 Zero Hunger</b></a>
+      <a class="vid rv d1" href="https://www.youtube.com/@UNFAO/search?query=state%20of%20food%20security" target="_blank"
+         style="background:linear-gradient(135deg,#1A9E77,#0F5FA8)"><small>FAO</small>
+         <div class="play"></div><b>FAO — The State of Food Security (SOFI)</b></a>
+      <a class="vid rv d2" href="https://www.youtube.com/@WorldFoodProgramme/search?query=hunger%20crisis" target="_blank"
+         style="background:linear-gradient(135deg,#E6A817,#D64550)"><small>WFP</small>
+         <div class="play"></div><b>World Food Programme — Global hunger crisis</b></a>
+    </div>
+  </div>
+</section>
+
+<section style="background:var(--mist)">
+  <div class="wrap">
+    <div class="center rv">
+      <div class="eyebrow">Open Data</div>
+      <h2>Built entirely on open sources</h2>
+      <p>Every number on this platform can be traced to an official, freely downloadable source.</p>
+    </div>
+    <div class="res rv d1">
+      <a href="https://www.fao.org/faostat/en/#data/FS" target="_blank"><b>FAOSTAT — Food Security Indicators</b>
+        <span>The primary dataset: undernourishment, dietary supply, import dependence. Free bulk CSV.</span></a>
+      <a href="https://data.worldbank.org" target="_blank"><b>World Bank Open Data</b>
+        <span>GDP per capita, growth, inflation and population — the economic features.</span></a>
+      <a href="https://www.fao.org/publications/sofi" target="_blank"><b>SOFI Report</b>
+        <span>FAO's flagship annual report — the professional benchmark for this topic.</span></a>
+      <a href="https://www.wfp.org/global-hunger-crisis" target="_blank"><b>WFP — Global Hunger Crisis</b>
+        <span>Live overview of hunger hotspots from the World Food Programme.</span></a>
+      <a href="https://sdgs.un.org/goals/goal2" target="_blank"><b>UN SDG 2 — Zero Hunger</b>
+        <span>The global goal this project's indicator (SDG 2.1.1) belongs to.</span></a>
+      <a href="https://ourworldindata.org/hunger-and-undernourishment" target="_blank"><b>Our World in Data — Hunger</b>
+        <span>Accessible charts and context on global undernourishment trends.</span></a>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap" style="max-width:840px">
+    <div class="center rv">
+      <div class="eyebrow">Questions</div>
+      <h2>Honest answers</h2>
+    </div>
+    <div class="rv d1">
+      <details><summary>What exactly is "hunger level" here?</summary>
+        <p>The Prevalence of Undernourishment (PoU) — the share of people whose daily food intake falls short of
+        energy requirements. It is <b>UN SDG Indicator 2.1.1</b>, estimated and published by FAO with a consistent
+        method across all countries and years.</p></details>
+      <details><summary>How accurate are the forecasts?</summary>
+        <p>On unseen years (2021–2023, including COVID aftermath and the price shock) our best models reach 96%
+        accuracy and 0.96 macro-F1. Crucially, <b>no high-risk country was ever misclassified as low-risk</b> —
+        the worst kind of error for an early-warning system never occurred in testing.</p></details>
+      <details><summary>Risk tiers rarely change — so what does the model add?</summary>
+        <p>True: about 96% of countries keep their tier from one year to the next, so "same as last year" is a strong
+        guess. The model's real value is the <b>explanation</b> — SHAP shows which pressures are building in each
+        country, which a naive guess can never do.</p></details>
+      <details><summary>Is the data up to date?</summary>
+        <p>FAO releases finalized data with a 1–2 year lag, so the panel ends in 2023 and forecasts 2024. The pipeline
+        is fully retrainable: when new data drops, one script refresh updates everything.</p></details>
+      <details><summary>What are the "trend" arrows on country pages?</summary>
+        <p>Simple 5-year linear projections for income, inflation and growth — clearly labelled as direction guides,
+        not machine-learning forecasts. The tier prediction itself comes from the trained models.</p></details>
+    </div>
+  </div>
+</section>
+
+<div class="band" style="min-height:44vh">
+  <img src="assets/earth.svg" alt="">
+  <div class="q rv">
+    <h2>Ready to explore?</h2>
+    <p style="margin-bottom:2rem">Start with the world map, or jump straight to a country you care about.</p>
+    <a class="btn btn-solid" href="explore.html">World map →</a>
+    <a class="btn btn-ghost" href="country.html">Country story →</a>
+  </div>
+</div>
+
+<script>fwFooter()</script>
+</body>
+</html>

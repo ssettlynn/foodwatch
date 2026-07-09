@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>World &amp; Patterns — FoodWatch</title>
+<link rel="stylesheet" href="style.css">
+<script src="plotly.min.js"></script>
+<script src="foodwatch_data.js"></script>
+<script src="fw.js"></script>
+</head>
+<body>
+<script>fwNav('explore.html',false)</script>
+
+<div class="pagehead">
+  <img class="bgart" src="assets/earth.svg" alt="">
+  <div class="wrap">
+    <div class="eyebrow" style="color:#FFD86B">Interactive Map</div>
+    <h1>The world, year by year</h1>
+    <p>Drag the slider — or press Play — and watch a decade of progress and its reversal.</p>
+  </div>
+</div>
+
+<section>
+  <div class="wrap">
+    <div class="card rv">
+      <div style="display:flex;gap:1.6rem;align-items:center;flex-wrap:wrap">
+        <b style="font-family:var(--serif);font-size:1.7rem" id="mapYearLab">2023</b>
+        <input type="range" id="mapYear" min="2010" max="2023" value="2023" style="flex:1;min-width:240px">
+        <button class="chip" id="playBtn">▶ Play</button>
+      </div>
+      <div class="kgrid" id="mapKpis"></div>
+      <div id="worldMap" style="height:500px"></div>
+      <div class="explain">💡 <b>How to read it:</b>
+        <span style="color:var(--teal)"><b>green = secure</b></span> (hunger under 5%),
+        <span style="color:var(--amber)"><b>amber = vulnerable</b></span> (5–15%),
+        <span style="color:var(--red)"><b>red = serious hunger</b></span> (over 15%).
+        Hover any country, then open its full story on the <a href="country.html">Country page</a>.</div>
+    </div>
+  </div>
+</section>
+
+<section style="background:var(--mist)">
+  <div class="wrap">
+    <div class="center rv">
+      <div class="eyebrow">The Big Patterns</div>
+      <h2>Four charts that explain global hunger</h2>
+      <p>All interactive — hover for details, click legends to hide and show.</p>
+    </div>
+    <div class="grid2">
+      <div class="chartbox rv"><h3>① The world was winning — then 2020 happened</h3>
+        <div id="chTrend" style="height:300px"></div>
+        <div class="explain">Hunger fell for a decade, then COVID-19 and the 2022 price shock erased half the progress.</div></div>
+      <div class="chartbox rv d1"><h3>② Where hunger lives</h3>
+        <div id="chRegion" style="height:300px"></div>
+        <div class="explain">Sub-Saharan Africa carries the highest burden — and is the only region back near its 2010 level.</div></div>
+      <div class="chartbox rv d2"><h3>③ Hunger follows income — structurally</h3>
+        <div id="chIncome" style="height:300px"></div>
+        <div class="explain">In the poorest group, the <i>typical</i> country sits above the serious-hunger line.</div></div>
+      <div class="chartbox rv d3"><h3>④ Money matters — until it doesn't</h3>
+        <div id="chScatter" style="height:300px"></div>
+        <div class="explain">Each dot is a country (2023). Income cuts hunger fast among the poor, then the effect flattens.</div></div>
+    </div>
+  </div>
+</section>
+
+<script>fwFooter()</script>
+<script>
+function yearData(y){const iso=[],z=[],txt=[],pou=[];
+ ISOs.forEach(c=>{const s=FW.SERIES[c],i=s.y.indexOf(y);
+  if(i>-1&&s.tier[i]){iso.push(c);z.push(TIERS.indexOf(s.tier[i]));
+   txt.push(`<b>${FW.META[c].n}</b><br>Hunger: ${s.pou[i]}%<br>Tier: ${s.tier[i]}`);pou.push(s.pou[i]);}});
+ return{iso,z,txt,pou};}
+function drawMap(y){const d=yearData(y);
+ Plotly.react('worldMap',[{type:'choropleth',locations:d.iso,z:d.z,text:d.txt,hoverinfo:'text',
+  zmin:0,zmax:2,colorscale:[[0,TC.Low],[.5,TC.Medium],[1,TC.High]],showscale:false,
+  marker:{line:{color:'#fff',width:.5}}}],
+  {...LAYOUT,geo:{projection:{type:'natural earth'},showframe:false,landcolor:'#E8EDF2',bgcolor:'rgba(0,0,0,0)'},
+   margin:{l:0,r:0,t:0,b:0}},PLOTCFG);
+ const hi=d.z.filter(v=>v===2).length;
+ document.getElementById('mapKpis').innerHTML=
+  `<div class="kpi"><div class="n" style="color:${TC.High}">${hi}</div><div class="l">serious hunger</div></div>
+   <div class="kpi"><div class="n" style="color:${TC.Medium}">${d.z.filter(v=>v===1).length}</div><div class="l">vulnerable</div></div>
+   <div class="kpi"><div class="n" style="color:${TC.Low}">${d.z.filter(v=>v===0).length}</div><div class="l">food-secure</div></div>
+   <div class="kpi"><div class="n">${(d.pou.reduce((a,b)=>a+b,0)/d.pou.length).toFixed(1)}%</div><div class="l">average hunger</div></div>`;}
+const yEl=document.getElementById('mapYear');
+yEl.oninput=()=>{document.getElementById('mapYearLab').textContent=yEl.value;drawMap(+yEl.value);};
+drawMap(2023);
+let playing=null;
+document.getElementById('playBtn').onclick=function(){
+ if(playing){clearInterval(playing);playing=null;this.textContent='▶ Play';return;}
+ this.textContent='⏸ Pause';let y=2010;
+ playing=setInterval(()=>{yEl.value=y;yEl.oninput();y++;if(y>2023){clearInterval(playing);playing=null;
+  document.getElementById('playBtn').textContent='▶ Play';}},650);};
+
+Plotly.newPlot('chTrend',[{x:FW.GLOB.years,y:FW.GLOB.global_pou,fill:'tozeroy',mode:'lines+markers',
+ line:{color:'#0F5FA8',width:3},fillcolor:'rgba(15,95,168,.12)'}],
+ {...LAYOUT,yaxis:{title:'avg hunger %'},shapes:[2020,2022].map(x=>({type:'line',x0:x,x1:x,y0:0,y1:1,yref:'paper',
+  line:{color:TC.High,dash:'dash',width:1.5}})),
+  annotations:[{x:2020,y:1,yref:'paper',text:'COVID',showarrow:false,font:{color:TC.High,size:10}},
+   {x:2022,y:.93,yref:'paper',text:'Price shock',showarrow:false,font:{color:TC.High,size:10}}]},PLOTCFG);
+const regColors=['#D64550','#E6A817','#0F5FA8','#1A9E77','#CC79A7','#8B93A7','#444'];
+Plotly.newPlot('chRegion',Object.keys(FW.GLOB.regions).map((r,i)=>({x:FW.GLOB.years,y:FW.GLOB.regions[r],
+ mode:'lines',name:r,line:{color:regColors[i%7],width:2.5}})),
+ {...LAYOUT,yaxis:{title:'avg hunger %'},legend:{font:{size:9}}},PLOTCFG);
+const incOrder=['High income','Upper middle income','Lower middle income','Low income'];
+Plotly.newPlot('chIncome',[{x:incOrder,y:incOrder.map(k=>FW.GLOB.income_2023[k]),type:'bar',
+ marker:{color:['#BFE3D6','#1A9E77','#E6A817','#D64550']},
+ text:incOrder.map(k=>FW.GLOB.income_2023[k]+'%'),textposition:'outside'}],
+ {...LAYOUT,yaxis:{title:'median hunger % (2023)'},
+  shapes:[{type:'line',x0:-.5,x1:3.5,y0:15,y1:15,line:{color:TC.High,dash:'dash'}}],
+  annotations:[{x:3.3,y:16.4,text:'serious-hunger line',showarrow:false,font:{color:TC.High,size:10}}]},PLOTCFG);
+(()=>{const xs={Low:[],Medium:[],High:[]},ys={Low:[],Medium:[],High:[]},ts={Low:[],Medium:[],High:[]};
+ ISOs.forEach(c=>{const s=FW.SERIES[c],i=s.y.indexOf(2023);
+  if(i>-1&&s.tier[i]&&s.gdp_per_capita[i]){xs[s.tier[i]].push(s.gdp_per_capita[i]);
+   ys[s.tier[i]].push(s.pou[i]);ts[s.tier[i]].push(FW.META[c].n);}});
+ Plotly.newPlot('chScatter',TIERS.map(t=>({x:xs[t],y:ys[t],text:ts[t],mode:'markers',name:t,
+  marker:{color:TC[t],size:8,opacity:.75},hovertemplate:'<b>%{text}</b><br>$%{x:,.0f} · %{y}%<extra></extra>'})),
+  {...LAYOUT,xaxis:{type:'log',title:'income per person (log)'},yaxis:{title:'hunger %'}},PLOTCFG);})();
+</script>
+</body>
+</html>

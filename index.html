@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FoodWatch — Predicting Hunger Before It Happens</title>
+<link rel="stylesheet" href="style.css">
+<script src="foodwatch_data.js"></script>
+<script src="fw.js"></script>
+</head>
+<body>
+<script>fwNav('index.html',false)</script>
+
+<header class="hero">
+  <img class="hero-img" src="assets/hero.svg" alt="">
+  <div class="hero-inner">
+    <h1>Predicting hunger,<br><span class="shimmer">one year before it happens.</span></h1>
+    <p>Open data from the UN's FAO and the World Bank, machine learning, and honest explanations —
+       explore where food security is heading, country by country.</p>
+    <div class="btns">
+      <a class="btn btn-solid" href="explore.html">Explore the world map</a>
+      <a class="btn btn-ghost" href="lab.html">Try the What-If Lab</a>
+    </div>
+  </div>
+  <div class="scroll-hint"></div>
+</header>
+
+<div class="marquee"><div class="marquee-track">
+ <span>FAOSTAT — FOOD SECURITY INDICATORS</span><span>•</span><span>WORLD BANK OPEN DATA</span><span>•</span>
+ <span>UN SDG 2 — ZERO HUNGER</span><span>•</span><span>168 COUNTRIES · 2010–2023</span><span>•</span>
+ <span>3 MODELS + SHAP EXPLAINABILITY</span><span>•</span>
+ <span>FAOSTAT — FOOD SECURITY INDICATORS</span><span>•</span><span>WORLD BANK OPEN DATA</span><span>•</span>
+ <span>UN SDG 2 — ZERO HUNGER</span><span>•</span><span>168 COUNTRIES · 2010–2023</span><span>•</span>
+ <span>3 MODELS + SHAP EXPLAINABILITY</span><span>•</span>
+</div></div>
+
+<section style="background:var(--mist)">
+  <div class="wrap stats">
+    <div class="stat rv"><div class="num red" data-count="34">0</div><div class="lab">countries predicted HIGH-risk in 2024</div></div>
+    <div class="stat rv d1"><div class="num" data-count="168">0</div><div class="lab">countries tracked, 2010–2023</div></div>
+    <div class="stat rv d2"><div class="num teal" data-count="96">0</div><div class="lab">% agreement across our 3 models</div></div>
+    <div class="stat rv d3"><div class="num amber" data-count="2160">0</div><div class="lab">country-year observations analysed</div></div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="center rv">
+      <div class="eyebrow">Start Exploring</div>
+      <h2>Four ways into the data</h2>
+      <p>Each section is its own page — pick where to begin.</p>
+    </div>
+    <div class="grid3">
+      <a class="feature rv" href="explore.html">
+        <div class="art"><img src="assets/earth.svg" alt="">🗺️</div>
+        <div class="body"><b>World &amp; Patterns</b>
+          <span>An animated world map of 14 years of hunger, plus the four big patterns that explain it.</span>
+          <em class="go">Explore →</em></div></a>
+      <a class="feature rv d1" href="country.html">
+        <div class="art"><img src="assets/market.svg" alt="">🌏</div>
+        <div class="body"><b>Country Story</b>
+          <span>Search any country: its 14-year journey, its 2024 outlook from three models, and why.</span>
+          <em class="go">Find a country →</em></div></a>
+      <a class="feature rv d2" href="forecast.html">
+        <div class="art">🔮</div>
+        <div class="body"><b>Forecast 2024</b>
+          <span>All 163 forecasts in one sortable table — switch between three models, download as CSV.</span>
+          <em class="go">See forecasts →</em></div></a>
+      <a class="feature rv d3" href="lab.html">
+        <div class="art">🧪</div>
+        <div class="body"><b>What-If Lab</b>
+          <span>A real model running live in your browser. Change a country's conditions and watch its risk shift.</span>
+          <em class="go">Run a scenario →</em></div></a>
+    </div>
+  </div>
+</section>
+
+<div class="band">
+  <img src="assets/market.svg" alt="">
+  <div class="q rv">
+    <h2>"Behind every percentage point are millions of families deciding which meal to skip."</h2>
+    <p>The 2022 price shock pushed 34 countries into high risk. Most of them saw it coming — in the data.</p>
+  </div>
+</div>
+
+<section>
+  <div class="wrap">
+    <div class="center rv">
+      <div class="eyebrow">The Scale</div>
+      <h2>Three tiers, defined by the UN FAO</h2>
+      <p>Every country-year is scored on official undernourishment bands.</p>
+    </div>
+    <div class="tiers">
+      <div class="tier rv" style="background:linear-gradient(135deg,#1A9E77,#137a5b)">
+        <h3>Low</h3><p>Undernourishment below 5%. Food access broadly secure; monitoring continues.</p><div class="big">&lt;5%</div></div>
+      <div class="tier rv d1" style="background:linear-gradient(135deg,#E6A817,#c2880e)">
+        <h3>Medium</h3><p>5–15%. Vulnerable to shocks — the tier where early action is cheapest and most effective.</p><div class="big">5–15</div></div>
+      <div class="tier rv d2" style="background:linear-gradient(135deg,#D64550,#a92f39)">
+        <h3>High</h3><p>Above 15%. Concentrated in Sub-Saharan Africa and crisis-affected states.</p><div class="big">15%+</div></div>
+    </div>
+  </div>
+</section>
+
+<section style="background:var(--mist);padding-bottom:6.5rem">
+  <div class="wrap center rv" style="margin-bottom:0">
+    <div class="eyebrow">Ready?</div>
+    <h2>See where the world is heading</h2>
+    <p style="margin-bottom:2rem">Fourteen years of data, three models, explained predictions.</p>
+    <a class="btn btn-blue" href="explore.html">Start with the world map →</a>
+  </div>
+</section>
+
+<script>fwFooter()</script>
+</body>
+</html>
