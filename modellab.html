@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Model Lab — FoodWatch</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script src="plotly.min.js"></script>
+<script src="foodwatch_data.js"></script>
+<script src="fw.js"></script>
+</head>
+<body>
+<script>fwNav('modellab.html',false)</script>
+
+<div class="pagehead">
+  <div class="wrap">
+    <div class="eyebrow" style="color:#FFD86B">How The Models Work</div>
+    <h1>Model Lab</h1>
+    <p>The full picture behind the forecasts — how well the models score, how far
+       ahead they can see, why they decide as they do, and the patterns hidden in the data.</p>
+  </div>
+</div>
+
+<!-- SECTION 1: horizon comparison -->
+<section>
+  <div class="wrap">
+    <div class="center rv">
+      <div class="eyebrow">One Year vs Five Years</div>
+      <h2>The further ahead we look, the harder it gets</h2>
+      <p>We built two models: one predicts next year, one predicts five years ahead — both from
+         the same ten signals. Accuracy drops with distance, and that drop is itself a finding.</p>
+    </div>
+    <div class="grid2">
+      <div class="chartbox rv"><h3>Accuracy by horizon (test set)</h3>
+        <div id="chHorizon" style="height:320px"></div>
+        <div class="explain">Macro-F1 falls from about 0.96 (1 year) to 0.83 (5 years). Why? Over five
+          years, four times as many countries change tier, and there are fewer complete records to learn from.</div></div>
+      <div class="chartbox rv d1"><h3>How often does the risk tier change?</h3>
+        <div id="chChange" style="height:320px"></div>
+        <div class="explain">Tiers are sticky year-to-year (about 4% change), which is why "same as last year"
+          is a strong baseline. Over five years, roughly 16% change — more room for a model to add value.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 2: model comparison table -->
+<section style="background:var(--mist)">
+  <div class="wrap">
+    <div class="center rv">
+      <div class="eyebrow">The Scoreboard</div>
+      <h2>Four models, tested honestly</h2>
+      <p>Every model is scored on data it never saw during training. "High-recall" is the share of truly
+         high-risk countries the model catches — the number that matters most for early warning.</p>
+    </div>
+    <div class="grid2">
+      <div class="chartbox rv"><h3>1-year horizon</h3><div class="tablewrap"><table id="tbl1"></table></div></div>
+      <div class="chartbox rv d1"><h3>5-year horizon</h3><div class="tablewrap"><table id="tbl5"></table></div></div>
+    </div>
+    <div class="explain rv d2" style="margin-top:1.4rem">Across both horizons and every model,
+      <b>no high-risk country was ever mislabelled as low-risk</b> — the worst possible error for an
+      early-warning system never occurred on the test data.</div>
+  </div>
+</section>
+
+<!-- SECTION 3: what drives risk (SHAP) -->
+<section>
+  <div class="wrap">
+    <div class="center rv">
+      <div class="eyebrow">Why The Model Decides</div>
+      <h2>What actually drives the risk</h2>
+      <p>A prediction nobody understands is a prediction nobody trusts. These bars show how much each
+         signal moves the forecast — and how that shifts as we look further ahead.</p>
+    </div>
+    <div class="chartbox rv"><div id="chShap" style="height:400px"></div>
+      <div class="explain">Current hunger dominates the one-year view. Over five years its weight fades and
+        <b>population growth rises</b> — near-term risk is about "who is struggling now", long-term risk is
+        more about structural pressure.</div></div>
+  </div>
+</section>
+
+<!-- SECTION 4: association rules -->
+<section style="background:var(--mist)">
+  <div class="wrap">
+    <div class="center rv">
+      <div class="eyebrow">Patterns In The Data</div>
+      <h2>Conditions that travel with hunger</h2>
+      <p>Beyond the models, we mined the data for combinations of conditions that occur together.
+         "Lift" tells you how many times more likely serious hunger is when a pattern holds.</p>
+    </div>
+    <div id="ruleCards" class="grid3 rv"></div>
+    <div class="explain rv d1" style="margin-top:1.4rem">The last rule explains something the charts could not:
+      import dependence looks harmless on its own because <b>rich</b> import-dependent countries are food-secure.
+      It only raises risk when combined with low income — a pattern single-variable analysis cannot see.</div>
+  </div>
+</section>
+
+<script>fwFooter()</script>
+<script>
+// ---- Section 1a: horizon comparison ----
+const rf1=FW.METRICS.find(m=>m.h==='1yr'&&m.model==='Random Forest');
+const rf5=FW.METRICS.find(m=>m.h==='5yr'&&m.model==='Random Forest');
+const b1=FW.METRICS.find(m=>m.h==='1yr'&&m.model==='Persistence');
+const b5=FW.METRICS.find(m=>m.h==='5yr'&&m.model==='Persistence');
+Plotly.newPlot('chHorizon',[
+ {x:['1 year','5 years'],y:[rf1.f1,rf5.f1],type:'bar',name:'Random Forest',marker:{color:'#0F5FA8'},text:[rf1.f1,rf5.f1],textposition:'outside'},
+ {x:['1 year','5 years'],y:[rf1.hr,rf5.hr],type:'bar',name:'catches high-risk',marker:{color:'#D64550'}},
+ {x:['1 year','5 years'],y:[b1.f1,b5.f1],type:'scatter',mode:'lines+markers',name:'baseline',line:{color:'#333',dash:'dash'}}
+],{...LAYOUT,yaxis:{range:[0.6,1],title:'score'},legend:{orientation:'h',y:1.15}},PLOTCFG);
+
+// ---- Section 1b: tier change rate ----
+Plotly.newPlot('chChange',[{x:['1 year','5 years'],y:[4.2,16.3],type:'bar',
+ marker:{color:['#1A9E77','#E6A817']},text:['4.2%','16.3%'],textposition:'outside'}],
+ {...LAYOUT,yaxis:{range:[0,20],title:'% of countries that change tier'}},PLOTCFG);
+
+// ---- Section 2: model tables ----
+function metricTable(h){
+ const rows=FW.METRICS.filter(m=>m.h===h);
+ return '<thead><tr><th>Model</th><th>Accuracy</th><th>Macro-F1</th><th>Catches high-risk</th></tr></thead><tbody>'+
+  rows.map(m=>{const best=m.model==='Random Forest';
+   return `<tr style="${best?'background:#EEF5FB;font-weight:600':''}"><td>${m.model}</td>
+    <td>${Math.round(m.acc*100)}%</td><td>${m.f1.toFixed(3)}</td><td>${Math.round(m.hr*100)}%</td></tr>`;}).join('')+'</tbody>';
+}
+document.getElementById('tbl1').innerHTML=metricTable('1yr');
+document.getElementById('tbl5').innerHTML=metricTable('5yr');
+
+// ---- Section 3: SHAP importance both horizons ----
+const feats=Object.keys(FW.SHAP['1yr']).sort((a,b)=>FW.SHAP['1yr'][b]-FW.SHAP['1yr'][a]);
+Plotly.newPlot('chShap',[
+ {y:feats.map(f=>FW.NICE[f]).reverse(),x:feats.map(f=>FW.SHAP['1yr'][f]).reverse(),type:'bar',orientation:'h',name:'1-year',marker:{color:'#0F5FA8'}},
+ {y:feats.map(f=>FW.NICE[f]).reverse(),x:feats.map(f=>FW.SHAP['5yr'][f]).reverse(),type:'bar',orientation:'h',name:'5-year',marker:{color:'#E6A817'}}
+],{...LAYOUT,barmode:'group',xaxis:{title:'impact on the forecast'},legend:{orientation:'h',y:1.08},margin:{l:150,r:20,t:30,b:40}},PLOTCFG);
+
+// ---- Section 4: rule cards ----
+document.getElementById('ruleCards').innerHTML=FW.RULES.map(r=>{
+ const risk=r.con==='HUNGER_HIGH';
+ const nice=s=>s.replace(/_/g,' ').toLowerCase().replace('supply inadequate','inadequate food supply')
+   .replace('income low','low income').replace('income high','high income')
+   .replace('popgrowth high','fast population growth').replace('import dep high','high import dependence');
+ return `<div class="card" style="border-left:4px solid ${risk?'#D64550':'#1A9E77'}">
+  <div style="font-size:1.6rem;font-weight:700;font-family:var(--serif);color:${risk?'#D64550':'#1A9E77'}">${r.lift}×</div>
+  <div style="font-size:.8rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">more likely ${risk?'serious hunger':'food-secure'}</div>
+  <p style="margin-top:.7rem;line-height:1.6">When <b>${nice(r.ant)}</b> ${risk?'→ serious hunger':'→ food-secure'}
+   <span style="color:var(--muted)">(holds ${Math.round(r.conf*100)}% of the time)</span></p></div>`;
+}).join('');
+</script>
+</body>
+</html>

@@ -15,7 +15,7 @@ const name2iso={};ISOs.forEach(i=>name2iso[FW.META[i].n]=i);
 
 function fwNav(active,solid){
  const items=[['index.html','Home'],['explore.html','World & Patterns'],['country.html','Country Story'],
-  ['forecast.html','Forecast 2024'],['lab.html','What-If Lab'],['learn.html','Learn']];
+  ['forecast.html','Forecast'],['modellab.html','Model Lab'],['lab.html','What-If Lab'],['learn.html','Learn']];
  document.write(`<div id="progress"></div><nav class="${solid?'solid':''}"><div class="bar">
   <a class="logo" href="index.html">🌾 FoodWatch</a>
   <button class="navtoggle" id="navToggle" aria-label="Menu"><span></span><span></span><span></span></button>
