@@ -69,8 +69,21 @@ function showCountry(name){const iso=name2iso[name];if(!iso)return;
  document.getElementById('cStrip').innerHTML='<b style="font-size:.9rem">Hunger tier, year by year:</b> '+
   s.y.map((y,i)=>s.tier[i]?`<span class="badge" style="background:${TC[s.tier[i]]};font-size:.72rem;margin:2px">${y}</span>`:'').join('');
 
- const P=FW.PRED[iso],O=FW.OUTLOOK[iso]||{};
- let html='<h2 style="font-size:1.5rem;margin-bottom:1.2rem">2024 forecast — three models</h2>';
+ const P=FW.PRED[iso],O=FW.OUTLOOK[iso]||{},R=(FW.REG||{})[iso];
+ let html='<h2 style="font-size:1.5rem;margin-bottom:1.2rem">2024 forecast</h2>';
+ // ---- v4.1: three predictions in one row (tier + value + direction) ----
+ const DIRC={Improving:'#1A9E77',Stable:'#5B6B7C',Worsening:'#D64550'};
+ const DIRI={Improving:'▼ improving',Stable:'▬ stable',Worsening:'▲ worsening'};
+ if(R){html+=`<div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1.4rem">
+   <div class="kpi" style="min-width:170px"><div class="l">Risk tier</div>
+    <div style="margin-top:.3rem"><span class="badge" style="background:${TC[R.tier]}">${R.tier}</span></div></div>
+   <div class="kpi" style="min-width:170px"><div class="l">Predicted hunger level</div>
+    <div class="n" style="color:#0F5FA8">${R.pou}%</div>
+    <div style="font-size:.75rem;color:var(--muted)">now ${R.now}%</div></div>
+   <div class="kpi" style="min-width:170px"><div class="l">Direction</div>
+    <div style="margin-top:.4rem;font-weight:700;color:${DIRC[R.dir]}">${DIRI[R.dir]}</div></div>
+  </div>`;}
+ html+='<h3 style="font-family:var(--sans);font-size:1rem;margin:.4rem 0 .8rem">Risk tier — three models agree?</h3>';
  if(P){html+='<div style="display:flex;gap:1rem;flex-wrap:wrap">';
   [['rf','Random Forest'],['lr','Logistic Regression'],['dt','Decision Tree']].forEach(([kk,nm])=>{
    const p=P[kk];html+=`<div class="kpi" style="min-width:200px"><div class="l">${nm}</div>

@@ -1,104 +1,121 @@
-# 🌾 FoodWatch — An Explainable Early-Warning System for National Food-Security Risk
+<div align="center">
 
-> An interactive web platform that predicts national food-security risk **one year ahead**,
-> built on 100% open data from the UN FAO and the World Bank.
+# 🌾 FoodWatch
 
-**Live site:** `https://<your-username>.github.io/foodwatch/` *(enable GitHub Pages — see below)*
+### An Explainable Early-Warning System for National Food-Security Risk
+
+Predicting where national hunger is heading — from open UN & World Bank data, with machine learning you can actually understand.
+
+[![Live Demo](https://img.shields.io/badge/▶_Live_Demo-GitHub_Pages-1A9E77?style=for-the-badge)](https://YOUR_USERNAME.github.io/foodwatch/)
 
 ![status](https://img.shields.io/badge/status-active-1A9E77)
-![data](https://img.shields.io/badge/data-FAOSTAT%20%2B%20World%20Bank-0F5FA8)
-![models](https://img.shields.io/badge/models-LogReg%20·%20DT%20·%20RF-E6A817)
+![data](https://img.shields.io/badge/data-FAOSTAT_+_World_Bank-0F5FA8)
+![models](https://img.shields.io/badge/models-LogReg_·_Tree_·_RF-E6A817)
+![explainability](https://img.shields.io/badge/explainability-SHAP_+_Apriori-CC79A7)
 ![license](https://img.shields.io/badge/license-MIT-blue)
+
+</div>
 
 ---
 
-## What it does
+## Overview
 
-- 🗺️ **World & Patterns** — an animated choropleth of 14 years of undernourishment (2010–2023),
-  plus the four big patterns that explain global hunger
-- 📖 **Country Story** — auto-written country summaries, trends vs. regional averages,
-  year-by-year risk history
-- 🔮 **Forecast 2024** — next-year risk-tier predictions from three switchable models,
-  with per-country confidence and CSV export
-- 🧪 **What-If Lab** — a live Logistic Regression running **entirely in the browser**:
-  drag sliders to change a country's economy and watch its predicted risk respond
-- 🧠 **Explainability** — SHAP-based "why the model thinks so" for every forecast
+**FoodWatch** turns open socioeconomic data into a forward-looking signal: it predicts each country's
+food-security **risk tier** (Low / Medium / High) one and five years ahead, explains *why* with SHAP,
+and surfaces hidden condition-patterns with association-rule mining — all in an interactive, zero-backend web app.
 
-No backend. No API keys. The entire site is static HTML/CSS/JS — the trained model's
-parameters are exported to JSON and evaluated client-side.
+> Built as an academic **Data Mining** course project (2026). 100% open data. The entire site is static
+> HTML/CSS/JS — the trained model's parameters are exported to JSON and evaluated **in the browser**.
 
-## The data
+## ✨ Features
 
-| Source | What we use | Link |
-|---|---|---|
-| **FAOSTAT** — Suite of Food Security Indicators | Prevalence of undernourishment (SDG 2.1.1), dietary energy supply adequacy, cereal import dependency, food supply variability | [fao.org/faostat](https://www.fao.org/faostat/en/#data/FS) |
-| **World Bank** — WDI | GDP per capita, GDP growth, inflation (CPI), population growth | [data.worldbank.org](https://data.worldbank.org) |
+| Page | What it does |
+|---|---|
+| 🗺️ **World & Patterns** | Animated choropleth of 14 years of undernourishment + the four big patterns behind global hunger |
+| 📖 **Country Story** | Auto-written country summaries, trend-vs-region charts, and a 2024–2028 outlook timeline |
+| 🔮 **Forecast** | Next-year risk-tier predictions from three switchable models, per-country confidence, CSV export |
+| 🧪 **Model Lab** | Accuracy by horizon, overfitting diagnosis, SHAP feature importance, and mined association rules |
+| 🎛️ **What-If Lab** | A live model in the browser — drag sliders to change a country's economy and watch its risk respond |
+| 📚 **Learn** | Methodology, official sources, UN/FAO videos, and an honest FAQ |
 
-**Panel:** 168 countries × 14 years (2010–2023) → 2,160 country-year training pairs.
-**Target:** next-year risk tier from FAO severity bands — Low (<5%), Medium (5–15%), High (≥15%).
+## 📊 Results
 
-## The models
+Models are evaluated on a **chronological hold-out test set** (data never seen during training).
 
-| Model | Macro-F1 (test 2020–2022) | Notes |
-|---|---|---|
-| Persistence baseline | 0.957 | "same tier as last year" |
-| **Logistic Regression** | **0.963** | powers the in-browser What-If Lab |
-| Decision Tree | 0.954 | interpretable middle |
-| **Random Forest** | **0.962** | default forecast model + SHAP |
+| Model | Macro-F1 (1-yr) | Macro-F1 (5-yr) |
+|---|:---:|:---:|
+| Persistence baseline | 0.957 | 0.834 |
+| Logistic Regression | 0.934 | 0.811 |
+| Decision Tree | 0.927 | 0.765 |
+| **Random Forest** | **0.958** | **0.831** |
 
-Key result: on unseen shock years (COVID aftermath + 2022 price shock),
-**no high-risk country was ever misclassified as low-risk** — the worst possible
-error for an early-warning system never occurred in testing.
+**Headline finding:** across every model and both horizons, **no high-risk country was ever misclassified
+as low-risk** — the worst possible error for an early-warning system never occurred on the test data.
 
-Leakage prevention: chronological train/test split (2010–2019 vs 2020–2022),
-GroupKFold by country for tuning, all preprocessing inside sklearn Pipelines.
+**Leakage prevention:** chronological train/validation/test split · GroupKFold by country for tuning ·
+all preprocessing inside scikit-learn Pipelines (fit on train only).
 
-## Run locally
+## 🗂️ Data
+
+| Source | Indicators used |
+|---|---|
+| **[FAOSTAT](https://www.fao.org/faostat/en/#data/FS)** — Suite of Food Security Indicators | Prevalence of undernourishment (SDG 2.1.1), dietary energy supply adequacy, cereal import dependency, food supply variability |
+| **[World Bank WDI](https://data.worldbank.org)** | GDP per capita, GDP growth, inflation (CPI), population growth |
+
+**Panel:** 182 countries × 14 years (2010–2023) · **Target tiers:** Low (<5%), Medium (5–15%), High (≥15%) — FAO severity bands. No API keys — official bulk CSV downloads only.
+
+## 🚀 Run locally
 
 ```bash
-git clone https://github.com/<your-username>/foodwatch.git
+git clone https://github.com/YOUR_USERNAME/foodwatch.git
 cd foodwatch
 python3 -m http.server 8000
-# open http://localhost:8000
+# then open http://localhost:8000
 ```
 
-Or simply double-click `index.html` — the site has zero dependencies beyond a browser.
+Or just double-click `index.html` — the site has zero dependencies beyond a browser.
 
-## Deploy on GitHub Pages
+## 🌐 Deploy (free, on GitHub Pages)
 
-1. Push this repo to GitHub
-2. **Settings → Pages → Source: Deploy from a branch → `main` / `(root)` → Save**
-3. Your site goes live at `https://<your-username>.github.io/foodwatch/`
+1. Push this repo to GitHub.
+2. **Settings → Pages → Source: _Deploy from a branch_ → `main` / `(root)` → Save.**
+3. Live in ~2 minutes at `https://YOUR_USERNAME.github.io/foodwatch/`.
 
-## Project structure
+## 🧱 Tech stack
+
+`Python` · `pandas` · `scikit-learn` · `SHAP` · `mlxtend` (Apriori) · `Plotly.js` · vanilla `HTML/CSS/JS` · GitHub Pages
+
+## 📁 Project structure
 
 ```
 foodwatch/
-├── index.html            # Home — hero, stats, entry points
-├── explore.html          # World map + the four big patterns
-├── country.html          # Country stories + 2024 outlook
-├── forecast.html         # 3-model forecast center
-├── lab.html              # In-browser what-if simulator
-├── learn.html            # Methodology, sources, videos, FAQ
-├── style.css             # Shared design system
-├── fw.js                 # Shared JS (nav, constants, reveal animations)
-├── foodwatch_data.js     # All data + exported model parameters (generated)
-├── plotly.min.js         # Charting library (vendored for offline use)
-├── assets/               # Hand-crafted SVG artwork + project figures
-├── app.py                # Optional: Streamlit dashboard variant
-└── prepare_dashboard_data.py  # Regenerates data from the ML pipeline
+├── index.html           # Home
+├── explore.html         # World map + patterns
+├── country.html         # Country stories + 2024–2028 outlook
+├── forecast.html        # Multi-model forecast center
+├── modellab.html        # Metrics, overfitting, SHAP, association rules
+├── lab.html             # In-browser what-if simulator
+├── learn.html           # Methodology, sources, FAQ
+├── style.css            # Shared design system
+├── fw.js                # Shared JS (nav, constants, animations)
+├── foodwatch_data.js    # Data + exported model parameters (generated)
+├── plotly.min.js        # Charting library (vendored, offline)
+├── assets/              # Hand-crafted SVG artwork + figures
+└── notebooks/           # KDD pipeline (01 collect → 07 SHAP)
 ```
 
-## Methodology (short version)
+## 🔬 Methodology
 
-KDD pipeline: FAOSTAT + World Bank CSV → ISO3 standardisation & merge →
-country-wise interpolation (gap ≤ 2 yr, flagged) → feature engineering
-(YoY hunger momentum, COVID flag, **lag target** `shift(-1)`) → EDA (14 charts) →
-3 classifiers with GroupKFold tuning → chronological hold-out evaluation →
-SHAP explainability → this site.
+**KDD pipeline:** FAOSTAT + World Bank CSV → ISO3 standardisation & merge → country-wise interpolation
+(gap ≤ 2 yr, flagged) → feature engineering (hunger momentum, COVID flag, **lag targets** `shift(-1)` &
+`shift(-5)`) → EDA (14 charts) + **Apriori** association mining → 3 classifiers × 2 horizons with a
+documented tuning journey → chronological test evaluation (overfitting, threshold tuning, bootstrap CI) →
+**SHAP** explainability → this site.
 
-Built as an academic Data Mining course project, 2026.
+## 📄 License
 
-## License
+[MIT](LICENSE) · Data © FAO / World Bank under their respective open-data terms.
 
-MIT — see [LICENSE](LICENSE). Data © FAO / World Bank under their open-data terms.
+<div align="center">
+<sub>Academic Data Mining project · 2026 · Open data · Built to be understood, not just accurate.</sub>
+</div>
