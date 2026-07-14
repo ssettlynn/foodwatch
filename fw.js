@@ -24,8 +24,9 @@ function fwNav(active,solid){
   `</ul></div></nav>`);}
 
 function fwFooter(){document.write(`<footer><div class="wrap"><div class="cols">
- <div><h4>🌾 FoodWatch</h4><p style="font-size:.9rem;line-height:1.7">An academic data-mining project predicting
- national food-security risk one year ahead — FAOSTAT + World Bank open data (2010–2023), three models,
+ <div><h4>🌾 FoodWatch</h4><p style="font-size:.82rem;color:#8FB4D6;margin-bottom:.5rem">An Explainable Early-Warning System for National Food-Security Risk</p>
+ <p style="font-size:.9rem;line-height:1.7">An academic data-mining project predicting national food-security
+ risk from socioeconomic signals — FAOSTAT + World Bank open data (2010–2023), machine learning,
  SHAP explainability. Runs entirely in your browser.</p></div>
  <div><h4>Explore</h4><a href="explore.html">World &amp; Patterns</a><a href="country.html">Country Story</a>
   <a href="forecast.html">Forecast 2024</a><a href="lab.html">What-If Lab</a></div>

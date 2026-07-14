@@ -1,4 +1,4 @@
-# 🌾 FoodWatch — Predicting Hunger Before It Happens
+# 🌾 FoodWatch — An Explainable Early-Warning System for National Food-Security Risk
 
 > An interactive web platform that predicts national food-security risk **one year ahead**,
 > built on 100% open data from the UN FAO and the World Bank.
