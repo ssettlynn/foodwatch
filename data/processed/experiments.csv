@@ -1,0 +1,19 @@
+horizon,experiment,config,train_f1,val_f1,gap_pp,val_high_recall
+1yr,exp0_persistence,predict = current tier,,0.963,,0.943
+5yr,exp0_persistence,predict = current tier,,0.842,,0.76
+1yr,exp1_logreg,median impute + scale + balanced,0.959,0.956,0.2,0.957
+5yr,exp1_logreg,median impute + scale + balanced,0.858,0.836,2.2,0.787
+1yr,exp2_dtree,"depth=5, leaf=10, balanced",0.967,0.93,3.7,0.943
+5yr,exp2_dtree,"depth=5, leaf=10, balanced",0.877,0.839,3.8,0.733
+1yr,exp3_rf_default,"depth=None, leaf=1 (no limits)",1.0,0.967,3.3,0.957
+5yr,exp3_rf_default,"depth=None, leaf=1 (no limits)",1.0,0.886,11.4,0.787
+1yr,exp4_rf_d15_l2,"depth=15, leaf=2",0.993,0.967,2.7,0.957
+1yr,exp4_rf_d10_l2,"depth=10, leaf=2",0.994,0.972,2.1,0.957
+1yr,exp4_rf_d10_l5,"depth=10, leaf=5",0.974,0.966,0.8,0.943
+1yr,exp4_rf_d8_l10,"depth=8, leaf=10",0.968,0.966,0.3,0.943
+1yr,exp4_rf_d5_l20,"depth=5, leaf=20",0.962,0.963,-0.1,0.943
+5yr,exp4_rf_d15_l2,"depth=15, leaf=2",0.99,0.888,10.2,0.773
+5yr,exp4_rf_d10_l2,"depth=10, leaf=2",0.989,0.881,10.8,0.76
+5yr,exp4_rf_d10_l5,"depth=10, leaf=5",0.944,0.867,7.7,0.733
+5yr,exp4_rf_d8_l10,"depth=8, leaf=10",0.896,0.858,3.8,0.72
+5yr,exp4_rf_d5_l20,"depth=5, leaf=20",0.878,0.853,2.5,0.72

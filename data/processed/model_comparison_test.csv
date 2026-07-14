@@ -1,0 +1,9 @@
+horizon,model,accuracy,high_recall,macro_f1
+1yr,dtree,0.925,0.982,0.927
+1yr,logreg,0.938,0.991,0.934
+1yr,persistence,,0.973,0.957
+1yr,rf_best,0.96,0.973,0.958
+5yr,dtree,0.787,0.722,0.765
+5yr,logreg,0.826,0.778,0.811
+5yr,persistence,,0.792,0.834
+5yr,rf_best,0.841,0.778,0.831

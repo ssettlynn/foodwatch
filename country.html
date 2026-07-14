@@ -45,7 +45,8 @@
 const dl=document.getElementById('cList');
 ISOs.map(i=>FW.META[i].n).sort().forEach(n=>{const o=document.createElement('option');o.value=n;dl.appendChild(o);});
 const mSel=document.getElementById('cMetric');
-['pou','gdp_per_capita','inflation_cpi','gdp_growth','des_adequacy','cereal_import_dep'].forEach(k=>{
+// five forecastable indicators — every selection has an aligned forecast
+['pou','gdp_per_capita','inflation_cpi','des_adequacy','pop_growth'].forEach(k=>{
  const o=document.createElement('option');o.value=k;o.textContent=LBL[k];mSel.appendChild(o);});
 
 function showCountry(name){const iso=name2iso[name];if(!iso)return;
@@ -56,7 +57,7 @@ function showCountry(name){const iso=name2iso[name];if(!iso)return;
  const lt=[...s.tier].reverse().find(v=>v);
  document.getElementById('cStory').innerHTML=
   `<h2 style="font-size:1.8rem">${m.n} <span class="badge" style="background:${TC[lt]||'#888'};vertical-align:middle">${lt} — ${MEAN[lt]||''}</span></h2>
-   <div class="explain">📖 <b>${m.n}'s story:</b> hunger has <b>${dir}</b> since 2010 (${first}% → ${last}%).
+   <div class="explain"><b>${m.n}'s story:</b> hunger has <b>${dir}</b> since 2010 (${first}% → ${last}%).
    Hardest year: <b>${peakY}</b>. Region: ${m.r} (${m.g}).</div>`;
  const regAvg=FW.GLOB.years.map(y=>{let sum=0,n=0;ISOs.forEach(c=>{if(FW.META[c].r===m.r){
   const i=FW.SERIES[c].y.indexOf(y);if(i>-1&&FW.SERIES[c][k]&&FW.SERIES[c][k][i]!=null){sum+=FW.SERIES[c][k][i];n++;}}});
@@ -69,39 +70,34 @@ function showCountry(name){const iso=name2iso[name];if(!iso)return;
  document.getElementById('cStrip').innerHTML='<b style="font-size:.9rem">Hunger tier, year by year:</b> '+
   s.y.map((y,i)=>s.tier[i]?`<span class="badge" style="background:${TC[s.tier[i]]};font-size:.72rem;margin:2px">${y}</span>`:'').join('');
 
- const P=FW.PRED[iso],O=FW.OUTLOOK[iso]||{},R=(FW.REG||{})[iso];
- let html='<h2 style="font-size:1.5rem;margin-bottom:1.2rem">2024 forecast</h2>';
- // ---- v4.1: three predictions in one row (tier + value + direction) ----
- const DIRC={Improving:'#1A9E77',Stable:'#5B6B7C',Worsening:'#D64550'};
- const DIRI={Improving:'▼ improving',Stable:'▬ stable',Worsening:'▲ worsening'};
- if(R){html+=`<div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1.4rem">
-   <div class="kpi" style="min-width:170px"><div class="l">Risk tier</div>
-    <div style="margin-top:.3rem"><span class="badge" style="background:${TC[R.tier]}">${R.tier}</span></div></div>
-   <div class="kpi" style="min-width:170px"><div class="l">Predicted hunger level</div>
-    <div class="n" style="color:#0F5FA8">${R.pou}%</div>
-    <div style="font-size:.75rem;color:var(--muted)">now ${R.now}%</div></div>
-   <div class="kpi" style="min-width:170px"><div class="l">Direction</div>
-    <div style="margin-top:.4rem;font-weight:700;color:${DIRC[R.dir]}">${DIRI[R.dir]}</div></div>
-  </div>`;}
- html+='<h3 style="font-family:var(--sans);font-size:1rem;margin:.4rem 0 .8rem">Risk tier — three models agree?</h3>';
+ const P=FW.PRED[iso],F=(FW.FORE||{})[iso];
+ const unit=FW.UNIT[k]||'';
+ const fmt=v=>k==='gdp_per_capita'?('$'+Math.round(v).toLocaleString()):(v+unit);
+ let html='';
+ // ---- v5: forecast ALIGNED to the selected indicator ----
+ if(F&&F[k]){const f=F[k];
+  html+=`<h2 style="font-size:1.5rem;margin-bottom:.4rem">${LBL[k].replace(/\\s*\\(.*\\)/,'')} — forecast</h2>
+   <div style="color:var(--muted);font-size:.9rem;margin-bottom:1.2rem">Where ${m.n}'s ${LBL[k].toLowerCase().replace(/\\s*\\(.*\\)/,'')} is heading, from the machine-learning model.</div>
+   <div style="display:flex;gap:1rem;flex-wrap:wrap">
+    <div class="kpi" style="min-width:150px"><div class="l">Now (2023)</div><div class="n">${f.now==null?'—':fmt(f.now)}</div></div>
+    <div class="kpi" style="min-width:150px;border-top:3px solid #0F5FA8"><div class="l">2024 forecast</div><div class="n" style="color:#0F5FA8">${fmt(f.y2024)}</div></div>
+    <div class="kpi" style="min-width:150px;border-top:3px solid #1A9E77"><div class="l">2028 outlook</div><div class="n" style="color:#1A9E77">${fmt(f.y2028)}</div></div>
+   </div>`;
+  // find this indicator's predictability for an honest caveat
+  const fm=(FW.FCMETRICS||[]).find(x=>x.ind===k);
+  if(fm){const weak=fm.r2_5<0.3;
+   html+=`<div class="explain" style="margin-top:1rem">This forecast is <b>${weak?'low-confidence':'reasonably reliable'}</b> —
+    on unseen test years the model's 5-year R² was ${fm.r2_5}. ${weak?'This indicator is volatile and hard to predict far ahead; treat the 2028 value as a rough direction only.':'This indicator changes slowly, so the model tracks it well.'}</div>`;}
+ }
+ // ---- risk-tier forecast (always shown; three models) ----
+ html+='<h3 style="font-family:var(--sans);font-size:1rem;margin:1.8rem 0 .8rem">Overall risk tier next year — do three models agree?</h3>';
  if(P){html+='<div style="display:flex;gap:1rem;flex-wrap:wrap">';
   [['rf','Random Forest'],['lr','Logistic Regression'],['dt','Decision Tree']].forEach(([kk,nm])=>{
-   const p=P[kk];html+=`<div class="kpi" style="min-width:200px"><div class="l">${nm}</div>
+   const p=P[kk];html+=`<div class="kpi" style="min-width:190px"><div class="l">${nm}</div>
     <div style="margin-top:.4rem"><span class="badge" style="background:${TC[p.t]}">${p.t}</span>
     <b style="font-size:.95rem"> ${Math.round(p.c*100)}% sure</b></div></div>`;});
   html+='</div>';}
  else html+='<div class="explain">No 2023 data available for a next-year forecast for this country.</div>';
- // ---- v4: five-year outlook timeline (2024-2028) from the 5-year model ----
- const oy=Object.keys(O).map(Number).sort();
- if(oy.length){
-  html+=`<h3 style="font-family:var(--sans);font-size:1rem;margin:1.8rem 0 .9rem">Five-year outlook (2024–2028)</h3>
-   <div style="display:flex;gap:.7rem;flex-wrap:wrap">`+
-   oy.map(y=>{const o=O[y];return `<div class="kpi" style="min-width:120px;text-align:center;padding:1rem">
-    <div style="font-family:var(--serif);font-size:1.3rem;font-weight:700">${y}</div>
-    <span class="badge" style="background:${TC[o.t]};margin:.3rem 0;display:inline-block">${o.t}</span>
-    <div style="font-size:.75rem;color:var(--muted)">${Math.round(o.c*100)}% sure</div></div>`;}).join('')+`</div>
-   <div style="font-size:.8rem;color:var(--muted);margin-top:.7rem">Each year comes from the five-year model applied to a past
-   year's data. Confidence naturally falls the further ahead we look — treat later years as direction, not certainty.</div>`;}
  html+=`<div style="margin-top:1.6rem"><a class="btn btn-blue" href="lab.html">Test scenarios for this country →</a>
    &nbsp;<a class="btn" style="border:1.5px solid #D7E0EA" href="modellab.html">How the models work →</a></div>`;
  document.getElementById('cOutlook').innerHTML=html;}

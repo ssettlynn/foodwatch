@@ -1,5 +1,0 @@
-Model,Macro_F1,High_Recall,Accuracy,beats_baseline
-Persistence baseline,0.957,0.973,0.958,False
-Logistic Regression,0.963,0.991,0.964,True
-Decision Tree,0.954,0.973,0.956,False
-Random Forest,0.962,0.973,0.964,True

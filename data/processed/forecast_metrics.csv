@@ -1,0 +1,11 @@
+indicator,label,horizon,baseline_mae,rf_mae,r2
+pou,Hunger level (%),1,0.52,0.5,0.99
+pou,Hunger level (%),5,2.08,2.05,0.87
+gdp_per_capita,Income per person ($),1,1667.81,1670.45,0.97
+gdp_per_capita,Income per person ($),5,2844.98,2883.96,0.93
+inflation_cpi,Inflation (%),1,6.29,5.81,0.55
+inflation_cpi,Inflation (%),5,8.51,9.56,-0.16
+des_adequacy,Food supply adequacy (%),1,0.92,1.03,0.99
+des_adequacy,Food supply adequacy (%),5,3.88,3.52,0.91
+pop_growth,Population growth (%),1,0.38,0.43,0.4
+pop_growth,Population growth (%),5,0.57,0.52,0.55
