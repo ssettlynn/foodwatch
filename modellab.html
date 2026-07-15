@@ -14,7 +14,7 @@
 
 <div class="pagehead">
   <div class="wrap">
-    <div class="eyebrow" style="color:#FFD86B">How The Models Work</div>
+    <div class="eyebrow" style="color:#F5B942">How The Models Work</div>
     <h1>Model Lab</h1>
     <p>The full picture behind the forecasts — how well the models score, how far
        ahead they can see, why they decide as they do, and the patterns hidden in the data.</p>
@@ -115,11 +115,11 @@
 // ---- Section 0: three prediction tasks ----
 document.getElementById('taskCards').innerHTML=(FW.TASKS||[]).map(t=>{
  const beats=t.type==='Regression'?t.score<t.baseline:t.score>t.baseline;
- return `<div class="card" style="border-top:4px solid #0F5FA8">
+ return `<div class="card" style="border-top:4px solid #4DA3FF">
   <div style="font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">${t.type}</div>
   <b style="font-size:1.15rem;display:block;margin:.3rem 0 .1rem">${t.name}</b>
   <span style="color:var(--muted);font-size:.88rem">${t.note}</span>
-  <div style="margin-top:1rem;font-family:var(--serif);font-size:1.8rem;font-weight:700;color:#0F5FA8">${t.score}</div>
+  <div style="margin-top:1rem;font-family:var(--serif);font-size:1.8rem;font-weight:700;color:#4DA3FF">${t.score}</div>
   <div style="font-size:.8rem;color:var(--muted)">${t.metric} · baseline ${t.baseline}${beats?' · <span style="color:#1A9E77;font-weight:700">beats it</span>':''}</div></div>`;
 }).join('');
 
@@ -129,9 +129,9 @@ const rf5=FW.METRICS.find(m=>m.h==='5yr'&&m.model==='Random Forest');
 const b1=FW.METRICS.find(m=>m.h==='1yr'&&m.model==='Persistence');
 const b5=FW.METRICS.find(m=>m.h==='5yr'&&m.model==='Persistence');
 Plotly.newPlot('chHorizon',[
- {x:['1 year','5 years'],y:[rf1.f1,rf5.f1],type:'bar',name:'Random Forest',marker:{color:'#0F5FA8'},text:[rf1.f1,rf5.f1],textposition:'outside'},
+ {x:['1 year','5 years'],y:[rf1.f1,rf5.f1],type:'bar',name:'Random Forest',marker:{color:'#4DA3FF'},text:[rf1.f1,rf5.f1],textposition:'outside'},
  {x:['1 year','5 years'],y:[rf1.hr,rf5.hr],type:'bar',name:'catches high-risk',marker:{color:'#D64550'}},
- {x:['1 year','5 years'],y:[b1.f1,b5.f1],type:'scatter',mode:'lines+markers',name:'baseline',line:{color:'#333',dash:'dash'}}
+ {x:['1 year','5 years'],y:[b1.f1,b5.f1],type:'scatter',mode:'lines+markers',name:'baseline',line:{color:'#C7D8E9',dash:'dash'}}
 ],{...LAYOUT,yaxis:{range:[0.6,1],title:'score'},legend:{orientation:'h',y:1.15}},PLOTCFG);
 
 // ---- Section 1b: tier change rate ----
@@ -144,7 +144,7 @@ function metricTable(h){
  const rows=FW.METRICS.filter(m=>m.h===h);
  return '<thead><tr><th>Model</th><th>Accuracy</th><th>Macro-F1</th><th>Catches high-risk</th></tr></thead><tbody>'+
   rows.map(m=>{const best=m.model==='Random Forest';
-   return `<tr style="${best?'background:#EEF5FB;font-weight:600':''}"><td>${m.model}</td>
+   return `<tr style="${best?'background:rgba(77,163,255,.12);font-weight:600':''}"><td>${m.model}</td>
     <td>${Math.round(m.acc*100)}%</td><td>${m.f1.toFixed(3)}</td><td>${Math.round(m.hr*100)}%</td></tr>`;}).join('')+'</tbody>';
 }
 document.getElementById('tbl1').innerHTML=metricTable('1yr');
@@ -153,7 +153,7 @@ document.getElementById('tbl5').innerHTML=metricTable('5yr');
 // ---- Section 3: SHAP importance both horizons ----
 const feats=Object.keys(FW.SHAP['1yr']).sort((a,b)=>FW.SHAP['1yr'][b]-FW.SHAP['1yr'][a]);
 Plotly.newPlot('chShap',[
- {y:feats.map(f=>FW.NICE[f]).reverse(),x:feats.map(f=>FW.SHAP['1yr'][f]).reverse(),type:'bar',orientation:'h',name:'1-year',marker:{color:'#0F5FA8'}},
+ {y:feats.map(f=>FW.NICE[f]).reverse(),x:feats.map(f=>FW.SHAP['1yr'][f]).reverse(),type:'bar',orientation:'h',name:'1-year',marker:{color:'#4DA3FF'}},
  {y:feats.map(f=>FW.NICE[f]).reverse(),x:feats.map(f=>FW.SHAP['5yr'][f]).reverse(),type:'bar',orientation:'h',name:'5-year',marker:{color:'#E6A817'}}
 ],{...LAYOUT,barmode:'group',xaxis:{title:'impact on the forecast'},legend:{orientation:'h',y:1.08},margin:{l:150,r:20,t:30,b:40}},PLOTCFG);
 

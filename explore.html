@@ -15,7 +15,7 @@
 <div class="pagehead">
   <img class="bgart" src="assets/earth.svg" alt="">
   <div class="wrap">
-    <div class="eyebrow" style="color:#FFD86B">Interactive Map</div>
+    <div class="eyebrow" style="color:#F5B942">Interactive Map</div>
     <h1>The world, year by year</h1>
     <p>Drag the slider — or press Play — and watch a decade of progress and its reversal.</p>
   </div>
@@ -82,8 +82,8 @@ function foreData(){const iso=[],z=[],txt=[];
 function renderMap(d){
  Plotly.react('worldMap',[{type:'choropleth',locations:d.iso,z:d.z,text:d.txt,hoverinfo:'text',
   zmin:0,zmax:2,colorscale:[[0,TC.Low],[.5,TC.Medium],[1,TC.High]],showscale:false,
-  marker:{line:{color:'#fff',width:.5}}}],
-  {...LAYOUT,geo:{projection:{type:'natural earth'},showframe:false,landcolor:'#E8EDF2',bgcolor:'rgba(0,0,0,0)'},
+  marker:{line:{color:'rgba(6,13,24,.7)',width:.5}}}],
+  {...LAYOUT,geo:{projection:{type:'natural earth'},showframe:false,landcolor:'#15263B',bgcolor:'rgba(0,0,0,0)'},
    margin:{l:0,r:0,t:0,b:0}},PLOTCFG);}
 function drawMap(y){const d=yearData(y);renderMap(d);
  document.getElementById('mapKpis').innerHTML=
@@ -119,18 +119,18 @@ document.getElementById('playBtn').onclick=function(){
   playLbl(false);}},650);};
 
 Plotly.newPlot('chTrend',[{x:FW.GLOB.years,y:FW.GLOB.global_pou,fill:'tozeroy',mode:'lines+markers',
- line:{color:'#0F5FA8',width:3},fillcolor:'rgba(15,95,168,.12)'}],
+ line:{color:'#4DA3FF',width:3},fillcolor:'rgba(77,163,255,.15)'}],
  {...LAYOUT,yaxis:{title:'avg hunger %'},shapes:[2020,2022].map(x=>({type:'line',x0:x,x1:x,y0:0,y1:1,yref:'paper',
   line:{color:TC.High,dash:'dash',width:1.5}})),
   annotations:[{x:2020,y:1,yref:'paper',text:'COVID',showarrow:false,font:{color:TC.High,size:10}},
    {x:2022,y:.93,yref:'paper',text:'Price shock',showarrow:false,font:{color:TC.High,size:10}}]},PLOTCFG);
-const regColors=['#D64550','#E6A817','#0F5FA8','#1A9E77','#CC79A7','#8B93A7','#444'];
+const regColors=['#D64550','#E6A817','#4DA3FF','#1A9E77','#CC79A7','#8B93A7','#B9C7D6'];
 Plotly.newPlot('chRegion',Object.keys(FW.GLOB.regions).map((r,i)=>({x:FW.GLOB.years,y:FW.GLOB.regions[r],
  mode:'lines',name:r,line:{color:regColors[i%7],width:2.5}})),
  {...LAYOUT,yaxis:{title:'avg hunger %'},legend:{font:{size:9}}},PLOTCFG);
 const incOrder=['High income','Upper middle income','Lower middle income','Low income'];
 Plotly.newPlot('chIncome',[{x:incOrder,y:incOrder.map(k=>FW.GLOB.income_2023[k]),type:'bar',
- marker:{color:['#BFE3D6','#1A9E77','#E6A817','#D64550']},
+ marker:{color:['#67D4B0','#1A9E77','#E6A817','#D64550']},
  text:incOrder.map(k=>FW.GLOB.income_2023[k]+'%'),textposition:'outside'}],
  {...LAYOUT,yaxis:{title:'median hunger % (2023)'},
   shapes:[{type:'line',x0:-.5,x1:3.5,y0:15,y1:15,line:{color:TC.High,dash:'dash'}}],

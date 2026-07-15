@@ -15,7 +15,7 @@
 <div class="pagehead">
   <img class="bgart" src="assets/market.svg" alt="">
   <div class="wrap">
-    <div class="eyebrow" style="color:#FFD86B">Country Story</div>
+    <div class="eyebrow" style="color:#F5B942">Country Story</div>
     <h1>Every country tells a story</h1>
     <p>Fourteen years of data, an auto-written summary, three model forecasts for 2024 —
        and the reasons behind them.</p>
@@ -63,8 +63,8 @@ function showCountry(name){const iso=name2iso[name];if(!iso)return;
  const regAvg=FW.GLOB.years.map(y=>{let sum=0,n=0;ISOs.forEach(c=>{if(FW.META[c].r===m.r){
   const i=FW.SERIES[c].y.indexOf(y);if(i>-1&&FW.SERIES[c][k]&&FW.SERIES[c][k][i]!=null){sum+=FW.SERIES[c][k][i];n++;}}});
   return n?sum/n:null;});
- Plotly.react('cChart',[{x:s.y,y:s[k],name:m.n,mode:'lines+markers',line:{color:'#0F5FA8',width:3}},
-  {x:FW.GLOB.years,y:regAvg,name:m.r+' average',line:{color:'#9AA8B5',width:2,dash:'dot'}}],
+ Plotly.react('cChart',[{x:s.y,y:s[k],name:m.n,mode:'lines+markers',line:{color:'#4DA3FF',width:3}},
+  {x:FW.GLOB.years,y:regAvg,name:m.r+' average',line:{color:'#7C90A6',width:2,dash:'dot'}}],
   {...LAYOUT,yaxis:{title:LBL[k]},legend:{orientation:'h',y:1.12},
    shapes:[2020,2022].map(x=>({type:'line',x0:x,x1:x,y0:0,y1:1,yref:'paper',
     line:{color:TC.High,dash:'dash',width:1}}))},PLOTCFG);
@@ -101,7 +101,7 @@ function showCountry(name){const iso=name2iso[name];if(!iso)return;
  else html+='<div class="explain">No 2023 data available for a next-year forecast for this country.</div>';
  html+=`<div style="margin-top:1.4rem;display:flex;gap:.7rem;flex-wrap:wrap;align-items:center">
    <a class="btn btn-blue" href="lab.html">Test scenarios →</a>
-   <a class="btn" style="border:1.5px solid #D7E0EA" href="modellab.html">How the models work →</a></div>`;
+   <a class="btn" style="border:1px solid rgba(255,255,255,.25)" href="modellab.html">How the models work →</a></div>`;
  document.getElementById('cOutlook').innerHTML=html;}
 document.getElementById('cSearch').addEventListener('change',e=>showCountry(e.target.value));
 mSel.onchange=()=>showCountry(document.getElementById('cSearch').value||'Myanmar');

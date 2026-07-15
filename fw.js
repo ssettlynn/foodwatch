@@ -25,8 +25,17 @@ const FICON={
  calendar:'<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
  book:'<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>'};
 const icn=(n,s=18)=>`<svg class="ic" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${FICON[n]}</svg>`;
+/* dark spatial chart theme — template supplies axis/geo defaults so
+   per-page `yaxis:{title:…}` overrides keep the dark grid automatically */
+const AXD={gridcolor:'rgba(255,255,255,.07)',zerolinecolor:'rgba(255,255,255,.14)',
+ linecolor:'rgba(255,255,255,.14)',tickcolor:'rgba(255,255,255,.2)'};
 const LAYOUT={paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(0,0,0,0)',
- font:{family:'Inter,sans-serif',color:'#13202E',size:12},margin:{l:52,r:14,t:14,b:42}};
+ font:{family:'Inter,sans-serif',color:'#C7D8E9',size:12},margin:{l:52,r:14,t:14,b:42},
+ hoverlabel:{bgcolor:'#0D1B2E',bordercolor:'rgba(255,255,255,.25)',font:{color:'#E9F1FA',family:'Inter,sans-serif'}},
+ template:{layout:{xaxis:AXD,yaxis:AXD,
+  geo:{bgcolor:'rgba(0,0,0,0)',landcolor:'#15263B',showframe:false,
+   coastlinecolor:'rgba(255,255,255,.12)',countrycolor:'rgba(255,255,255,.08)'},
+  legend:{font:{color:'#C7D8E9'}}}}};
 const ISOs=(typeof FW!=='undefined')?Object.keys(FW.META):[];
 const name2iso={};ISOs.forEach(i=>name2iso[FW.META[i].n]=i);
 
@@ -91,5 +100,12 @@ addEventListener('DOMContentLoaded',()=>{
    if(!raf)raf=requestAnimationFrame(()=>{raf=null;
     document.querySelectorAll('.plx').forEach(el=>{const d=+el.dataset.depth||12;
      el.style.translate=`${(px*d).toFixed(1)}px ${(py*d).toFixed(1)}px`;});});},{passive:true});
+  /* specular highlight follows the cursor across glass panels (delegated,
+     so panels rendered later — KPIs, tables — light up too) */
+  addEventListener('pointermove',e=>{
+   const p=e.target.closest?.('.card,.chartbox,.feature');if(!p)return;
+   const r=p.getBoundingClientRect();
+   p.style.setProperty('--mx',(e.clientX-r.left)+'px');
+   p.style.setProperty('--my',(e.clientY-r.top)+'px');},{passive:true});
  }
 });
