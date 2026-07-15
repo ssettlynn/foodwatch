@@ -120,7 +120,7 @@ document.getElementById('taskCards').innerHTML=(FW.TASKS||[]).map(t=>{
   <b style="font-size:1.15rem;display:block;margin:.3rem 0 .1rem">${t.name}</b>
   <span style="color:var(--muted);font-size:.88rem">${t.note}</span>
   <div style="margin-top:1rem;font-family:var(--serif);font-size:1.8rem;font-weight:700;color:#0F5FA8">${t.score}</div>
-  <div style="font-size:.8rem;color:var(--muted)">${t.metric} · baseline ${t.baseline} ${beats?'<span style="color:#1A9E77">✓ beats</span>':''}</div></div>`;
+  <div style="font-size:.8rem;color:var(--muted)">${t.metric} · baseline ${t.baseline}${beats?' · <span style="color:#1A9E77;font-weight:700">beats it</span>':''}</div></div>`;
 }).join('');
 
 // ---- Section 1a: horizon comparison ----

@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Country Story — FoodWatch</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <script src="plotly.min.js"></script>
 <script src="foodwatch_data.js"></script>
@@ -25,7 +26,7 @@
   <div class="wrap">
     <div class="card rv">
       <div style="display:flex;gap:1.2rem;flex-wrap:wrap;align-items:center">
-        <input type="text" id="cSearch" list="cList" placeholder="🔎 Type a country — try Myanmar, Kenya, Haiti…" style="flex:1;min-width:280px">
+        <input type="text" id="cSearch" list="cList" placeholder="Type a country — try Myanmar, Kenya, Haiti…" style="flex:1;min-width:280px">
         <datalist id="cList"></datalist>
         <select id="cMetric"></select>
       </div>
@@ -79,9 +80,9 @@ function showCountry(name){const iso=name2iso[name];if(!iso)return;
   html+=`<h2 style="font-size:1.5rem;margin-bottom:.4rem">${LBL[k].replace(/\\s*\\(.*\\)/,'')} — forecast</h2>
    <div style="color:var(--muted);font-size:.9rem;margin-bottom:1.2rem">Where ${m.n}'s ${LBL[k].toLowerCase().replace(/\\s*\\(.*\\)/,'')} is heading, from the machine-learning model.</div>
    <div style="display:flex;gap:1rem;flex-wrap:wrap">
-    <div class="kpi" style="min-width:150px"><div class="l">Now (2023)</div><div class="n">${f.now==null?'—':fmt(f.now)}</div></div>
-    <div class="kpi" style="min-width:150px;border-top:3px solid #0F5FA8"><div class="l">2024 forecast</div><div class="n" style="color:#0F5FA8">${fmt(f.y2024)}</div></div>
-    <div class="kpi" style="min-width:150px;border-top:3px solid #1A9E77"><div class="l">2028 outlook</div><div class="n" style="color:#1A9E77">${fmt(f.y2028)}</div></div>
+    <div class="kpi" style="min-width:150px"><div class="l">Observed · Now (2023)</div><div class="n">${f.now==null?'—':fmt(f.now)}</div></div>
+    <div class="kpi" style="min-width:150px;border-top:3px solid var(--blue)"><div class="l" style="color:var(--blue)">Forecast · 2024</div><div class="n" style="color:var(--blue)">${fmt(f.y2024)}</div></div>
+    <div class="kpi fc" style="min-width:150px;border-top:3px solid var(--violet)"><div class="l" style="color:var(--violet)">Five-year outlook · 2028</div><div class="n" style="color:var(--violet)">${fmt(f.y2028)}</div></div>
    </div>`;
   // find this indicator's predictability for an honest caveat
   const fm=(FW.FCMETRICS||[]).find(x=>x.ind===k);

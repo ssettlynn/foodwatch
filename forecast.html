@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Forecast — FoodWatch</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <script src="plotly.min.js"></script>
 <script src="foodwatch_data.js"></script>
@@ -25,10 +26,10 @@
     <div class="card rv">
       <div style="display:flex;gap:.8rem;flex-wrap:wrap;align-items:center">
         <span style="font-size:.82rem;font-weight:700;color:var(--muted)">Horizon</span>
-        <button class="chip hchip on" data-h="1">Next year (2024)</button>
-        <button class="chip hchip" data-h="5">Five years (2028)</button>
+        <button class="chip hchip on" data-h="1"><script>document.write(icn('calendar',15))</script> Next year (2024)</button>
+        <button class="chip hchip fc" data-h="5"><script>document.write(icn('trend',15))</script> Five years (2028)</button>
         <input type="text" id="fSearch" placeholder="filter countries…" style="margin-left:auto;min-width:220px">
-        <button class="chip" id="csvBtn">Download CSV</button>
+        <button class="chip" id="csvBtn"><script>document.write(icn('download',15))</script> CSV</button>
       </div>
       <div style="display:flex;gap:.8rem;flex-wrap:wrap;align-items:center;margin-top:.8rem" id="mRow">
         <span style="font-size:.82rem;font-weight:700;color:var(--muted)">Model</span>
@@ -69,8 +70,8 @@ function drawForecast(){const q=(document.getElementById('fSearch').value||'').t
   {...LAYOUT,showlegend:false,margin:{l:0,r:0,t:0,b:0},
    annotations:[{text:`<b>${fRows().length}</b><br>countries`,showarrow:false}]},PLOTCFG);
  document.getElementById('fNote').innerHTML=fHorizon==='5'
-  ?`The long-horizon model expects <b>${cnt.High} countries</b> in serious hunger by 2028. Five-year forecasts are less certain — test macro-F1 0.83 vs 0.96 for next-year.`
-  :`This model expects <b>${cnt.High} countries</b> in serious hunger in 2024.`;
+  ?`<span class="tagfc" style="margin-bottom:.5rem">Five-year model forecast</span><br>The long-horizon model expects <b>${cnt.High} countries</b> in serious hunger by 2028. Five-year forecasts are less certain — test macro-F1 0.83 vs 0.96 for next-year.`
+  :`<span class="tagnow" style="margin-bottom:.5rem">Next-year model forecast</span><br>This model expects <b>${cnt.High} countries</b> in serious hunger in 2024.`;
  document.getElementById('fTable').innerHTML=
   `<thead><tr><th>Country</th><th>Hunger today</th><th>${yr} forecast</th><th>How sure?</th></tr></thead><tbody>`+
   rows.map(r=>`<tr><td><b>${r.n}</b></td><td>${r.pou??'—'}%</td>

@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>World &amp; Patterns — FoodWatch</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <script src="plotly.min.js"></script>
 <script src="foodwatch_data.js"></script>
@@ -24,11 +25,12 @@
   <div class="wrap">
     <div class="card rv">
       <div style="display:flex;gap:.8rem;align-items:center;flex-wrap:wrap">
-        <button class="chip modechip on" data-mode="hist">History 2010–2023</button>
-        <button class="chip modechip" data-mode="fore">2028 forecast</button>
+        <button class="chip modechip on" data-mode="hist"><script>document.write(icn('clock',16))</script> History 2010–2023</button>
+        <button class="chip modechip fc" data-mode="fore"><script>document.write(icn('trend',16))</script> 2028 forecast</button>
         <b style="font-family:var(--serif);font-size:1.7rem;margin-left:.8rem" id="mapYearLab">2023</b>
+        <span class="tagfc" id="fcTag" style="display:none">Model forecast</span>
         <input type="range" id="mapYear" min="2010" max="2023" value="2023" style="flex:1;min-width:240px">
-        <button class="chip" id="playBtn">▶ Play</button>
+        <button class="chip" id="playBtn"><script>document.write(icn('play',15))</script> Play</button>
       </div>
       <div class="kgrid" id="mapKpis"></div>
       <div id="worldMap" style="height:500px"></div>
@@ -50,16 +52,16 @@
       <p>All interactive — hover for details, click legends to hide and show.</p>
     </div>
     <div class="grid2">
-      <div class="chartbox rv"><h3>① The world was winning — then 2020 happened</h3>
+      <div class="chartbox rv"><h3><span class="cnum">1</span>The world was winning — then 2020 happened</h3>
         <div id="chTrend" style="height:300px"></div>
         <div class="explain">Hunger fell for a decade, then COVID-19 and the 2022 price shock erased half the progress.</div></div>
-      <div class="chartbox rv d1"><h3>② Where hunger lives</h3>
+      <div class="chartbox rv d1"><h3><span class="cnum">2</span>Where hunger lives</h3>
         <div id="chRegion" style="height:300px"></div>
         <div class="explain">Sub-Saharan Africa carries the highest burden — and is the only region back near its 2010 level.</div></div>
-      <div class="chartbox rv d2"><h3>③ Hunger follows income — structurally</h3>
+      <div class="chartbox rv d2"><h3><span class="cnum">3</span>Hunger follows income — structurally</h3>
         <div id="chIncome" style="height:300px"></div>
         <div class="explain">In the poorest group, the <i>typical</i> country sits above the serious-hunger line.</div></div>
-      <div class="chartbox rv d3"><h3>④ Money matters — until it doesn't</h3>
+      <div class="chartbox rv d3"><h3><span class="cnum">4</span>Money matters — until it doesn't</h3>
         <div id="chScatter" style="height:300px"></div>
         <div class="explain">Each dot is a country (2023). Income cuts hunger fast among the poor, then the effect flattens.</div></div>
     </div>
@@ -93,28 +95,30 @@ function drawMap(y){const d=yearData(y);renderMap(d);
    <div class="kpi"><div class="n">${(d.pou.reduce((a,b)=>a+b,0)/d.pou.length).toFixed(1)}%</div><div class="l">average hunger</div></div>`;}
 function drawForeMap(){const d=foreData();renderMap(d);
  document.getElementById('mapKpis').innerHTML=
-  `<div class="kpi"><div class="n" style="color:${TC.High}">${d.z.filter(v=>v===2).length}</div><div class="l">serious hunger by 2028</div></div>
-   <div class="kpi"><div class="n" style="color:${TC.Medium}">${d.z.filter(v=>v===1).length}</div><div class="l">vulnerable by 2028</div></div>
-   <div class="kpi"><div class="n" style="color:${TC.Low}">${d.z.filter(v=>v===0).length}</div><div class="l">food-secure by 2028</div></div>
-   <div class="kpi"><div class="n">${d.iso.length}</div><div class="l">countries forecast</div></div>`;}
+  `<div class="kpi fc"><div class="n" style="color:${TC.High}">${d.z.filter(v=>v===2).length}</div><div class="l">serious hunger by 2028</div></div>
+   <div class="kpi fc"><div class="n" style="color:${TC.Medium}">${d.z.filter(v=>v===1).length}</div><div class="l">vulnerable by 2028</div></div>
+   <div class="kpi fc"><div class="n" style="color:${TC.Low}">${d.z.filter(v=>v===0).length}</div><div class="l">food-secure by 2028</div></div>
+   <div class="kpi fc"><div class="n" style="color:var(--violet)">${d.iso.length}</div><div class="l">countries forecast</div></div>`;}
 const yEl=document.getElementById('mapYear');
 yEl.oninput=()=>{document.getElementById('mapYearLab').textContent=yEl.value;drawMap(+yEl.value);};
+const playLbl=on=>document.getElementById('playBtn').innerHTML=(on?icn('pause',15)+' Pause':icn('play',15)+' Play');
 function setMode(mode){mapMode=mode;
  document.querySelectorAll('.modechip').forEach(c=>c.classList.toggle('on',c.dataset.mode===mode));
  const fore=mode==='fore';
  yEl.disabled=fore;yEl.style.opacity=fore?.35:1;
  document.getElementById('playBtn').style.display=fore?'none':'';
- if(fore){if(playing){clearInterval(playing);playing=null;document.getElementById('playBtn').textContent='▶ Play';}
+ document.getElementById('fcTag').style.display=fore?'':'none';
+ if(fore){if(playing){clearInterval(playing);playing=null;playLbl(false);}
   document.getElementById('mapYearLab').textContent='2028';drawForeMap();}
  else{document.getElementById('mapYearLab').textContent=yEl.value;drawMap(+yEl.value);}}
 document.querySelectorAll('.modechip').forEach(ch=>ch.onclick=()=>setMode(ch.dataset.mode));
 drawMap(2023);
 let playing=null;
 document.getElementById('playBtn').onclick=function(){
- if(playing){clearInterval(playing);playing=null;this.textContent='▶ Play';return;}
- this.textContent='⏸ Pause';let y=2010;
+ if(playing){clearInterval(playing);playing=null;playLbl(false);return;}
+ playLbl(true);let y=2010;
  playing=setInterval(()=>{yEl.value=y;yEl.oninput();y++;if(y>2023){clearInterval(playing);playing=null;
-  document.getElementById('playBtn').textContent='▶ Play';}},650);};
+  playLbl(false);}},650);};
 
 Plotly.newPlot('chTrend',[{x:FW.GLOB.years,y:FW.GLOB.global_pou,fill:'tozeroy',mode:'lines+markers',
  line:{color:'#0F5FA8',width:3},fillcolor:'rgba(15,95,168,.12)'}],

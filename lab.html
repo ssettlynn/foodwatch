@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>What-If Lab — FoodWatch</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <script src="plotly.min.js"></script>
 <script src="foodwatch_data.js"></script>
@@ -26,7 +27,7 @@
     <div class="card rv">
       <div style="display:flex;gap:1.2rem;flex-wrap:wrap">
         <select id="wCountry" style="min-width:260px"></select>
-        <button class="chip" id="wReset">↺ Reset to real values</button>
+        <button class="chip" id="wReset"><script>document.write(icn('reset',15))</script> Reset to real values</button>
       </div>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:0 2.6rem" id="wSliders"></div>
     </div>
@@ -74,17 +75,17 @@ function softmax(model,x){
 function predictWF(){const x=WFEAT.map(f=>f==='covid_flag'?0:+document.getElementById('s_'+f).value);
  const r1=softmax(LR,x),r5=softmax(LR5,x);
  const realP=FW.PRED[name2iso[wSel.value]],real=realP?realP.lr.t:'?';
- const cell=(label,r,note)=>
+ const cell=(tag,label,r,note)=>
   `<div style="flex:1;min-width:150px;text-align:center">
-    <div style="font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">${label}</div>
-    <div style="font-family:var(--serif);font-size:2.2rem;font-weight:700;color:${TC[r.best]}">${r.best}</div>
+    <span class="${tag}">${label}</span>
+    <div style="font-family:var(--serif);font-size:2.2rem;font-weight:700;color:${TC[r.best]};margin-top:.35rem">${r.best}</div>
     <div style="font-size:.82rem;color:var(--muted);line-height:1.5">${Math.round(r.conf*100)}% sure${note}</div>
    </div>`;
  document.getElementById('wResult').innerHTML=
   `<div style="display:flex;gap:.6rem;flex-wrap:wrap">
-    ${cell('Your scenario → 2024',r1,r1.best===real?'<br>same as the real forecast':'<br><b style=color:#D64550>changed from the real forecast ('+real+')</b>')}
+    ${cell('tagnow','Your scenario → 2024',r1,r1.best===real?'<br>same as the real forecast':'<br><b style=color:#D64550>changed from the real forecast ('+real+')</b>')}
     <div style="width:1px;background:var(--line,#E4EAF0)"></div>
-    ${cell('If it persists → 2028',r5,r5.best===r1.best?'<br>holds over five years':'<br><b>drifts to '+r5.best+' longer-term</b>')}
+    ${cell('tagfc','If it persists → 2028',r5,r5.best===r1.best?'<br>holds over five years':'<br><b>drifts to '+r5.best+' longer-term</b>')}
    </div>`;
  Plotly.react('wProbs',[
   {type:'bar',orientation:'h',y:TIERS,x:r1.ord,name:'2024',

@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FoodWatch — An Explainable Early-Warning System for National Food-Security Risk</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <script src="foodwatch_data.js"></script>
 <script src="fw.js"></script>
@@ -52,26 +53,27 @@
     </div>
     <div class="grid3">
       <a class="feature rv" href="explore.html">
-        <div class="art"><img src="assets/earth.svg" alt="">🗺️</div>
+        <div class="art"><img src="assets/earth.svg" alt=""><span class="artic" data-ic="map"></span></div>
         <div class="body"><b>World &amp; Patterns</b>
           <span>An animated world map of 14 years of hunger, plus the four big patterns that explain it.</span>
           <em class="go">Explore →</em></div></a>
       <a class="feature rv d1" href="country.html">
-        <div class="art"><img src="assets/market.svg" alt="">🌏</div>
+        <div class="art"><img src="assets/market.svg" alt=""><span class="artic" data-ic="book"></span></div>
         <div class="body"><b>Country Story</b>
-          <span>Search any country: its 14-year journey, its 2024 outlook from three models, and why.</span>
+          <span>Search any country: its 14-year journey, its 2024–2028 outlook from the models, and why.</span>
           <em class="go">Find a country →</em></div></a>
       <a class="feature rv d2" href="forecast.html">
-        <div class="art">🔮</div>
-        <div class="body"><b>Forecast 2024</b>
-          <span>All 163 forecasts in one sortable table — switch between three models, download as CSV.</span>
+        <div class="art"><span class="artic" data-ic="trend"></span></div>
+        <div class="body"><b>Forecast 2024–2028</b>
+          <span>All 163 forecasts in one sortable table — next year from three models, five years from the long-horizon model.</span>
           <em class="go">See forecasts →</em></div></a>
       <a class="feature rv d3" href="lab.html">
-        <div class="art">🧪</div>
+        <div class="art"><span class="artic" data-ic="sliders"></span></div>
         <div class="body"><b>What-If Lab</b>
-          <span>A real model running live in your browser. Change a country's conditions and watch its risk shift.</span>
+          <span>Two real models running live in your browser. Change a country's conditions and watch its 2024 and 2028 risk shift.</span>
           <em class="go">Run a scenario →</em></div></a>
     </div>
+    <script>document.querySelectorAll('.artic').forEach(s=>s.innerHTML=icn(s.dataset.ic,30));</script>
   </div>
 </section>
 
