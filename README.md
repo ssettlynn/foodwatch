@@ -20,9 +20,12 @@ Predicting where national hunger is heading — from open UN & World Bank data, 
 
 ## Overview
 
-**FoodWatch** turns open socioeconomic data into a forward-looking signal: it predicts each country's
-food-security **risk tier** (Low / Medium / High) one and five years ahead, explains *why* with SHAP,
-and surfaces hidden condition-patterns with association-rule mining — all in an interactive, zero-backend web app.
+**FoodWatch** turns open socioeconomic data into a forward-looking signal. From the same signals it answers
+**three prediction tasks** — a country's food-security **risk tier** (Low / Medium / High), its exact
+**hunger level** (%), and its **risk direction** (improving / stable / worsening) — one *and* five years
+ahead. It also forecasts the future value of **five indicators** (hunger, income, inflation, food supply,
+population growth), explains *why* with SHAP, and surfaces hidden condition-patterns with association-rule
+mining — all in an interactive, zero-backend web app.
 
 > Built as an academic **Data Mining** course project (2026). 100% open data. The entire site is static
 > HTML/CSS/JS — the trained model's parameters are exported to JSON and evaluated **in the browser**.
@@ -31,11 +34,11 @@ and surfaces hidden condition-patterns with association-rule mining — all in a
 
 | Page | What it does |
 |---|---|
-| 🗺️ **World & Patterns** | Animated choropleth of 14 years of undernourishment + the four big patterns behind global hunger |
-| 📖 **Country Story** | Auto-written country summaries, trend-vs-region charts, and a 2024–2028 outlook timeline |
-| 🔮 **Forecast** | Next-year risk-tier predictions from three switchable models, per-country confidence, CSV export |
-| 🧪 **Model Lab** | Accuracy by horizon, overfitting diagnosis, SHAP feature importance, and mined association rules |
-| 🎛️ **What-If Lab** | A live model in the browser — drag sliders to change a country's economy and watch its risk respond |
+| 🗺️ **World & Patterns** | Animated choropleth of 14 years of undernourishment, a **2028-forecast map layer**, and the four big patterns behind global hunger |
+| 📖 **Country Story** | Auto-written summaries and trend-vs-region charts; pick any indicator to see its **aligned 2024 forecast + 2028 outlook** with an honest reliability caveat |
+| 🔮 **Forecast** | A **1-year / 5-year horizon toggle** (three switchable models for next year, long-horizon model for 2028), per-country confidence, per-country **indicator forecast tiles**, CSV export |
+| 🧪 **Model Lab** | The **three prediction tasks**, accuracy by horizon, overfitting diagnosis, SHAP feature importance, and mined association rules |
+| 🎛️ **What-If Lab** | Two live models in the browser — drag sliders and watch a country's **2024 *and* 2028** risk respond, plus its indicator forecasts |
 | 📚 **Learn** | Methodology, official sources, UN/FAO videos, and an honest FAQ |
 
 ## 📊 Results
@@ -54,6 +57,30 @@ as low-risk** — the worst possible error for an early-warning system never occ
 
 **Leakage prevention:** chronological train/validation/test split · GroupKFold by country for tuning ·
 all preprocessing inside scikit-learn Pipelines (fit on train only).
+
+### Three prediction tasks (next year)
+
+| Task | Type | Metric | Score | Baseline |
+|---|---|:---:|:---:|:---:|
+| **Risk tier** | Classification (3-class) | macro-F1 | **0.958** | 0.957 |
+| **Hunger level** | Regression | MAE (pp) | **0.49** | 0.52 |
+| **Risk direction** | Classification (3-class) | macro-F1 | **0.645** | acc 0.70 |
+
+Predicting the *level* is easy (hunger is autocorrelated); predicting the *direction of change* is the genuinely
+hard early-warning question — and we report it honestly.
+
+### Multi-indicator forecasting — where prediction has limits
+
+We forecast the future value of five indicators and measure test-set R². The result draws an **honest boundary**:
+
+| Indicator | 1-yr R² | 5-yr R² | |
+|---|:---:|:---:|---|
+| Hunger level, Income, Food supply | 0.97–0.99 | 0.87–0.93 | structural → reliable |
+| Population growth | 0.40 | 0.55 | moderate |
+| **Inflation** | 0.55 | **−0.16** | shock-driven → **5-yr unpredictable** |
+
+Inflation's negative 5-year R² means the model cannot beat a naive "no change" guess — a deliberate,
+documented limit on what forecasting can claim.
 
 ## 🗂️ Data
 
@@ -99,18 +126,23 @@ foodwatch/
 ├── style.css            # Shared design system
 ├── fw.js                # Shared JS (nav, constants, animations)
 ├── foodwatch_data.js    # Data + exported model parameters (generated)
+├── prepare_dashboard_data.py  # Regenerates foodwatch_data.js from models + CSVs
 ├── plotly.min.js        # Charting library (vendored, offline)
 ├── assets/              # Hand-crafted SVG artwork + figures
-└── notebooks/           # KDD pipeline (01 collect → 07 SHAP)
+└── notebooks/           # KDD pipeline (01 collect → 08 indicator forecasting)
 ```
 
 ## 🔬 Methodology
 
 **KDD pipeline:** FAOSTAT + World Bank CSV → ISO3 standardisation & merge → country-wise interpolation
 (gap ≤ 2 yr, flagged) → feature engineering (hunger momentum, COVID flag, **lag targets** `shift(-1)` &
-`shift(-5)`) → EDA (14 charts) + **Apriori** association mining → 3 classifiers × 2 horizons with a
-documented tuning journey → chronological test evaluation (overfitting, threshold tuning, bootstrap CI) →
-**SHAP** explainability → this site.
+`shift(-5)`, plus tier/value/direction targets) → EDA (14 charts) + **Apriori** association mining →
+3 classifiers × 2 horizons with a documented tuning journey → chronological test evaluation (overfitting,
+threshold tuning, bootstrap CI) → **SHAP** explainability → **multi-indicator regression forecasting**
+(notebook 08 — five indicators × two horizons) → this site.
+
+The model parameters are baked into `foodwatch_data.js` by `prepare_dashboard_data.py`; the What-If Lab
+runs a Logistic Regression **live in the browser** (softmax in JS, verified to match scikit-learn to 6 decimals).
 
 ## 📄 License
 
