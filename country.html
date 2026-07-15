@@ -77,30 +77,31 @@ function showCountry(name){const iso=name2iso[name];if(!iso)return;
  let html='';
  // ---- v5: forecast ALIGNED to the selected indicator ----
  if(F&&F[k]){const f=F[k];
-  html+=`<h2 style="font-size:1.5rem;margin-bottom:.4rem">${LBL[k].replace(/\\s*\\(.*\\)/,'')} — forecast</h2>
-   <div style="color:var(--muted);font-size:.9rem;margin-bottom:1.2rem">Where ${m.n}'s ${LBL[k].toLowerCase().replace(/\\s*\\(.*\\)/,'')} is heading, from the machine-learning model.</div>
-   <div style="display:flex;gap:1rem;flex-wrap:wrap">
-    <div class="kpi" style="min-width:150px"><div class="l">Observed · Now (2023)</div><div class="n">${f.now==null?'—':fmt(f.now)}</div></div>
-    <div class="kpi" style="min-width:150px;border-top:3px solid var(--blue)"><div class="l" style="color:var(--blue)">Forecast · 2024</div><div class="n" style="color:var(--blue)">${fmt(f.y2024)}</div></div>
-    <div class="kpi fc" style="min-width:150px;border-top:3px solid var(--violet)"><div class="l" style="color:var(--violet)">Five-year outlook · 2028</div><div class="n" style="color:var(--violet)">${fmt(f.y2028)}</div></div>
+  html+=`<h2 style="font-size:1.2rem;margin-bottom:.9rem">Where ${m.n}'s ${LBL[k].toLowerCase().replace(/\s*\(.*\)/,'')} is heading</h2>
+   <div style="display:flex;gap:.9rem;flex-wrap:wrap">
+    <div class="kpi" style="min-width:135px"><div class="l">Now (2023)</div><div class="n">${f.now==null?'—':fmt(f.now)}</div></div>
+    <div class="kpi" style="min-width:135px;border-top:3px solid var(--blue)"><div class="l" style="color:var(--blue)">2024 forecast</div><div class="n" style="color:var(--blue)">${fmt(f.y2024)}</div></div>
+    <div class="kpi fc" style="min-width:135px"><div class="l" style="color:var(--violet)">2028 outlook</div><div class="n" style="color:var(--violet)">${fmt(f.y2028)}</div></div>
    </div>`;
-  // find this indicator's predictability for an honest caveat
+  // honest, plain-language reliability caveat
   const fm=(FW.FCMETRICS||[]).find(x=>x.ind===k);
   if(fm){const weak=fm.r2_5<0.3;
-   html+=`<div class="explain" style="margin-top:1rem">This forecast is <b>${weak?'low-confidence':'reasonably reliable'}</b> —
-    on unseen test years the model's 5-year R² was ${fm.r2_5}. ${weak?'This indicator is volatile and hard to predict far ahead; treat the 2028 value as a rough direction only.':'This indicator changes slowly, so the model tracks it well.'}</div>`;}
+   html+=`<div class="explain" style="margin-top:.9rem">${weak
+    ?'This one is <b>hard to predict</b> far ahead — it jumps around a lot. Take the 2028 number as a rough direction only.'
+    :'This forecast is <b>reliable</b> — the number changes slowly, and the model tracked it well on past years.'}</div>`;}
  }
  // ---- risk-tier forecast (always shown; three models) ----
- html+='<h3 style="font-family:var(--sans);font-size:1rem;margin:1.8rem 0 .8rem">Overall risk tier next year — do three models agree?</h3>';
- if(P){html+='<div style="display:flex;gap:1rem;flex-wrap:wrap">';
+ html+='<h3 style="font-family:var(--sans);font-size:.95rem;margin:1.6rem 0 .7rem">Risk tier next year — do three models agree?</h3>';
+ if(P){html+='<div style="display:flex;gap:.9rem;flex-wrap:wrap">';
   [['rf','Random Forest'],['lr','Logistic Regression'],['dt','Decision Tree']].forEach(([kk,nm])=>{
-   const p=P[kk];html+=`<div class="kpi" style="min-width:190px"><div class="l">${nm}</div>
-    <div style="margin-top:.4rem"><span class="badge" style="background:${TC[p.t]}">${p.t}</span>
-    <b style="font-size:.95rem"> ${Math.round(p.c*100)}% sure</b></div></div>`;});
+   const p=P[kk];html+=`<div class="kpi" style="min-width:160px"><div class="l">${nm}</div>
+    <div style="margin-top:.35rem"><span class="badge" style="background:${TC[p.t]};font-size:.78rem">${p.t}</span>
+    <b style="font-size:.85rem"> ${Math.round(p.c*100)}% sure</b></div></div>`;});
   html+='</div>';}
  else html+='<div class="explain">No 2023 data available for a next-year forecast for this country.</div>';
- html+=`<div style="margin-top:1.6rem"><a class="btn btn-blue" href="lab.html">Test scenarios for this country →</a>
-   &nbsp;<a class="btn" style="border:1.5px solid #D7E0EA" href="modellab.html">How the models work →</a></div>`;
+ html+=`<div style="margin-top:1.4rem;display:flex;gap:.7rem;flex-wrap:wrap;align-items:center">
+   <a class="btn btn-blue" href="lab.html">Test scenarios →</a>
+   <a class="btn" style="border:1.5px solid #D7E0EA" href="modellab.html">How the models work →</a></div>`;
  document.getElementById('cOutlook').innerHTML=html;}
 document.getElementById('cSearch').addEventListener('change',e=>showCountry(e.target.value));
 mSel.onchange=()=>showCountry(document.getElementById('cSearch').value||'Myanmar');

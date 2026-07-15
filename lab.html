@@ -36,9 +36,15 @@
       <div class="card rv" id="wResult"></div>
       <div class="card rv d1"><div id="wProbs" style="height:220px"></div></div>
     </div>
-    <div class="explain rv d2">Educational scenario tool — two live Logistic Regression models (next-year
-      macro-F1 0.93, five-year 0.81) computed entirely in your browser. The five-year outcome assumes the
-      conditions you set persist; real forecasts use verified data, not manual inputs.</div>
+
+    <div class="card rv d2" style="margin-top:1.6rem">
+      <h3 style="font-family:var(--sans);font-size:1.02rem;margin:0" id="wForeTitle">Model forecasts for this country</h3>
+      <div style="color:var(--muted);font-size:.84rem;margin-top:.25rem">What the trained models expect from real data — before any slider changes.</div>
+      <div id="wForeCards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.9rem;margin-top:1.1rem"></div>
+    </div>
+
+    <div class="explain rv d3">A teaching tool — two real models run live in your browser.
+      The 2028 result assumes the conditions you set stay the same. Official forecasts use verified data.</div>
   </div>
 </section>
 
@@ -78,8 +84,8 @@ function predictWF(){const x=WFEAT.map(f=>f==='covid_flag'?0:+document.getElemen
  const cell=(tag,label,r,note)=>
   `<div style="flex:1;min-width:150px;text-align:center">
     <span class="${tag}">${label}</span>
-    <div style="font-family:var(--serif);font-size:2.2rem;font-weight:700;color:${TC[r.best]};margin-top:.35rem">${r.best}</div>
-    <div style="font-size:.82rem;color:var(--muted);line-height:1.5">${Math.round(r.conf*100)}% sure${note}</div>
+    <div style="font-family:var(--serif);font-size:1.9rem;font-weight:700;color:${TC[r.best]};margin-top:.35rem">${r.best}</div>
+    <div style="font-size:.78rem;color:var(--muted);line-height:1.5">${Math.round(r.conf*100)}% sure${note}</div>
    </div>`;
  document.getElementById('wResult').innerHTML=
   `<div style="display:flex;gap:.6rem;flex-wrap:wrap">
@@ -94,9 +100,21 @@ function predictWF(){const x=WFEAT.map(f=>f==='covid_flag'?0:+document.getElemen
    marker:{color:TIERS.map(t=>TC[t]),opacity:.45},text:r5.ord.map(p=>Math.round(p*100)+'%'),textposition:'outside'}],
   {...LAYOUT,barmode:'group',xaxis:{range:[0,1.18],showgrid:false},
    legend:{orientation:'h',y:1.25},margin:{l:76,r:36,t:8,b:24}},PLOTCFG);}
-wSel.onchange=buildSliders;
+// static indicator forecasts for the selected country (from the trained regression models)
+function fmtInd(k,v){if(v==null)return '—';
+ return k==='gdp_per_capita'?('$'+Math.round(v).toLocaleString()):(v+(FW.UNIT[k]||''));}
+function drawFore(){const iso=name2iso[wSel.value],F=(FW.FORE||{})[iso]||{};
+ document.getElementById('wForeTitle').textContent='Model forecasts for '+wSel.value;
+ document.getElementById('wForeCards').innerHTML=Object.keys(F).map(k=>{
+  const f=F[k];
+  return `<div class="mini"><div class="t">${FW.NICE[k]||k}</div>
+   <div class="row"><span>Now (2023)</span><b>${fmtInd(k,f.now)}</b></div>
+   <div class="row f24"><span>2024</span><b>${fmtInd(k,f.y2024)}</b></div>
+   <div class="row f28"><span>2028</span><b>${fmtInd(k,f.y2028)}</b></div></div>`;}).join('')
+  ||'<div class="explain">No indicator forecasts available for this country.</div>';}
+wSel.onchange=()=>{buildSliders();drawFore();};
 document.getElementById('wReset').onclick=buildSliders;
-buildSliders();
+buildSliders();drawFore();
 </script>
 </body>
 </html>

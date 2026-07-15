@@ -43,10 +43,19 @@
         <div class="tablewrap"><table id="fTable"></table></div>
       </div>
     </div>
-    <div class="explain rv d1" style="margin-top:1.6rem"><b>How good are these models?</b> On unseen years
-      the next-year models reach 96% accuracy and the five-year model 83% — and at both horizons
-      <b>no high-risk country was ever misclassified as low-risk</b>, the worst possible error for an
-      early-warning system. Full methodology on the <a href="learn.html">Learn page</a>.</div>
+    <div class="card rv d1" style="margin-top:1.6rem">
+      <div style="display:flex;gap:1rem;align-items:center;flex-wrap:wrap">
+        <div>
+          <h3 style="font-family:var(--sans);font-size:1.02rem;margin:0">Every forecast for one country</h3>
+          <div style="color:var(--muted);font-size:.84rem;margin-top:.25rem">Five indicators, each predicted for 2024 and 2028.</div>
+        </div>
+        <select id="iCountry" style="margin-left:auto;min-width:220px"></select>
+      </div>
+      <div id="iCards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.9rem;margin-top:1.1rem"></div>
+    </div>
+    <div class="explain rv d2" style="margin-top:1.4rem">On years the models never saw, next-year forecasts
+      were right 96% of the time (five-year: 83%) — and <b>no high-risk country was ever mistaken for
+      low-risk</b>. Full methodology on the <a href="learn.html">Learn page</a>.</div>
   </div>
 </section>
 
@@ -97,6 +106,22 @@ document.getElementById('csvBtn').onclick=()=>{const rows=fRows();
  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
  a.download=`foodwatch_forecast_${yr}.csv`;a.click();};
 drawForecast();
+
+// ---- every indicator forecast for one country ----
+const iSel=document.getElementById('iCountry');
+ISOs.filter(i=>FW.FORE&&FW.FORE[i]).map(i=>FW.META[i].n).sort().forEach(n=>{
+ const o=document.createElement('option');o.value=n;o.textContent=n;iSel.appendChild(o);});
+function fmtInd(k,v){if(v==null)return '—';
+ return k==='gdp_per_capita'?('$'+Math.round(v).toLocaleString()):(v+(FW.UNIT[k]||''));}
+function drawIndicators(){const iso=name2iso[iSel.value],F=FW.FORE[iso]||{};
+ document.getElementById('iCards').innerHTML=Object.keys(F).map(k=>{
+  const f=F[k];
+  return `<div class="mini"><div class="t">${FW.NICE[k]||k}</div>
+   <div class="row"><span>Now (2023)</span><b>${fmtInd(k,f.now)}</b></div>
+   <div class="row f24"><span>2024</span><b>${fmtInd(k,f.y2024)}</b></div>
+   <div class="row f28"><span>2028</span><b>${fmtInd(k,f.y2028)}</b></div></div>`;}).join('');}
+iSel.onchange=drawIndicators;
+iSel.value='Myanmar';drawIndicators();
 </script>
 </body>
 </html>
