@@ -12,7 +12,7 @@
 <script>fwNav('index.html',false)</script>
 
 <header class="hero">
-  <img class="hero-img" src="assets/hero.svg" alt="">
+  <img class="hero-img plx" data-depth="16" src="assets/hero.svg" alt="">
   <div class="hero-inner">
     <div class="eyebrow" style="color:#FFD86B;margin-bottom:1rem">FoodWatch · An Explainable Early-Warning System for National Food-Security Risk</div>
     <h1>Predicting hunger,<br><span class="shimmer">before it happens.</span></h1>
@@ -52,22 +52,22 @@
       <p>Each section is its own page — pick where to begin.</p>
     </div>
     <div class="grid4">
-      <a class="feature rv" href="explore.html">
+      <a class="feature rv" data-tilt href="explore.html">
         <div class="art"><img src="assets/earth.svg" alt=""></div>
         <div class="body"><b>World &amp; Patterns</b>
           <span>An animated world map of 14 years of hunger, and the patterns behind it.</span>
           <em class="go">Explore →</em></div></a>
-      <a class="feature rv d1" href="country.html">
+      <a class="feature rv d1" data-tilt href="country.html">
         <div class="art"><img src="assets/market.svg" alt=""></div>
         <div class="body"><b>Country Story</b>
           <span>Search any country: its journey, its 2024–2028 outlook, and why.</span>
           <em class="go">Find a country →</em></div></a>
-      <a class="feature rv d2" href="forecast.html">
+      <a class="feature rv d2" data-tilt href="forecast.html">
         <div class="art"><img src="assets/hero.svg" alt=""></div>
         <div class="body"><b>Forecast 2024–2028</b>
           <span>All 163 forecasts, sortable — next year and five years ahead.</span>
           <em class="go">See forecasts →</em></div></a>
-      <a class="feature rv d3" href="lab.html">
+      <a class="feature rv d3" data-tilt href="lab.html">
         <div class="art"><img src="assets/lab.svg" alt=""></div>
         <div class="body"><b>What-If Lab</b>
           <span>Live models in your browser — change conditions, watch risk shift.</span>
@@ -92,12 +92,15 @@
       <p>Every country-year is scored on official undernourishment bands.</p>
     </div>
     <div class="tiers">
-      <div class="tier rv" style="background:linear-gradient(135deg,#1A9E77,#137a5b)">
-        <h3>Low</h3><p>Undernourishment below 5%. Food access broadly secure; monitoring continues.</p><div class="big">&lt;5%</div></div>
-      <div class="tier rv d1" style="background:linear-gradient(135deg,#E6A817,#c2880e)">
-        <h3>Medium</h3><p>5–15%. Vulnerable to shocks — the tier where early action is cheapest and most effective.</p><div class="big">5–15</div></div>
-      <div class="tier rv d2" style="background:linear-gradient(135deg,#D64550,#a92f39)">
-        <h3>High</h3><p>Above 15%. Concentrated in Sub-Saharan Africa and crisis-affected states.</p><div class="big">15%+</div></div>
+      <div class="tier rv" data-tilt style="--tint:#1A9E77">
+        <span class="tb">Low</span><div class="tnum">&lt;5%</div>
+        <p>Undernourishment below 5%. Food access broadly secure; monitoring continues.</p></div>
+      <div class="tier rv d1" data-tilt style="--tint:#E6A817">
+        <span class="tb">Medium</span><div class="tnum">5–15%</div>
+        <p>Vulnerable to shocks — the tier where early action is cheapest and most effective.</p></div>
+      <div class="tier rv d2" data-tilt style="--tint:#D64550">
+        <span class="tb">High</span><div class="tnum">15%+</div>
+        <p>Above 15%. Concentrated in Sub-Saharan Africa and crisis-affected states.</p></div>
     </div>
   </div>
 </section>

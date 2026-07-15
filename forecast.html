@@ -24,19 +24,21 @@
 <section>
   <div class="wrap">
     <div class="card rv">
-      <div style="display:flex;gap:.8rem;flex-wrap:wrap;align-items:center">
-        <span style="font-size:.82rem;font-weight:700;color:var(--muted)">Horizon</span>
-        <button class="chip hchip on" data-h="1"><script>document.write(icn('calendar',15))</script> Next year (2024)</button>
-        <button class="chip hchip fc" data-h="5"><script>document.write(icn('trend',15))</script> Five years (2028)</button>
-        <input type="text" id="fSearch" placeholder="filter countries…" style="margin-left:auto;min-width:220px">
-        <button class="chip" id="csvBtn"><script>document.write(icn('download',15))</script> CSV</button>
-      </div>
-      <div style="display:flex;gap:.8rem;flex-wrap:wrap;align-items:center;margin-top:.8rem" id="mRow">
-        <span style="font-size:.82rem;font-weight:700;color:var(--muted)">Model</span>
-        <button class="chip mchip on" data-m="rf">Random Forest</button>
-        <button class="chip mchip" data-m="lr">Logistic Regression</button>
-        <button class="chip mchip" data-m="dt">Decision Tree</button>
-        <span id="mNote" style="display:none;font-size:.82rem;color:var(--muted)">Five-year outlook uses the long-horizon Random Forest only.</span>
+      <div class="ctl">
+        <span class="ctl-l">Horizon</span>
+        <div class="ctl-r">
+          <button class="chip hchip on" data-h="1"><script>document.write(icn('calendar',15))</script> Next year (2024)</button>
+          <button class="chip hchip fc" data-h="5"><script>document.write(icn('trend',15))</script> Five years (2028)</button>
+          <input type="text" id="fSearch" placeholder="filter countries…" style="margin-left:auto;min-width:200px">
+          <button class="chip" id="csvBtn"><script>document.write(icn('download',15))</script> CSV</button>
+        </div>
+        <span class="ctl-l">Model</span>
+        <div class="ctl-r" id="mRow">
+          <button class="chip mchip on" data-m="rf">Random Forest</button>
+          <button class="chip mchip" data-m="lr">Logistic Regression</button>
+          <button class="chip mchip" data-m="dt">Decision Tree</button>
+          <span id="mNote" style="display:none;font-size:.82rem;color:var(--muted)">Five-year outlook uses the long-horizon Random Forest only.</span>
+        </div>
       </div>
       <div style="display:grid;grid-template-columns:300px 1fr;gap:2rem;margin-top:1.8rem" id="fWrap">
         <div><div id="fDonut" style="height:260px"></div><div id="fNote" class="explain"></div></div>
