@@ -14,9 +14,9 @@
 <div class="pagehead">
   <div class="wrap">
     <div class="eyebrow" style="color:#FFD86B">Machine Learning</div>
-    <h1>2024 Forecast Center</h1>
-    <p>Three models, trained on 2010–2019 and stress-tested on the COVID years.
-       They agree on 96% of countries — the disagreements mark borderline cases.</p>
+    <h1>Forecast Center</h1>
+    <p>Next-year forecasts from three models — plus a five-year outlook from the
+       long-horizon Random Forest. Switch the horizon to see how far the models can look.</p>
   </div>
 </div>
 
@@ -24,50 +24,77 @@
   <div class="wrap">
     <div class="card rv">
       <div style="display:flex;gap:.8rem;flex-wrap:wrap;align-items:center">
-        <button class="chip mchip on" data-m="rf">🌲 Random Forest</button>
-        <button class="chip mchip" data-m="lr">📐 Logistic Regression</button>
-        <button class="chip mchip" data-m="dt">🌳 Decision Tree</button>
-        <input type="text" id="fSearch" placeholder="🔎 filter countries…" style="margin-left:auto;min-width:220px">
-        <button class="chip" id="csvBtn">⬇ CSV</button>
+        <span style="font-size:.82rem;font-weight:700;color:var(--muted)">Horizon</span>
+        <button class="chip hchip on" data-h="1">Next year (2024)</button>
+        <button class="chip hchip" data-h="5">Five years (2028)</button>
+        <input type="text" id="fSearch" placeholder="filter countries…" style="margin-left:auto;min-width:220px">
+        <button class="chip" id="csvBtn">Download CSV</button>
+      </div>
+      <div style="display:flex;gap:.8rem;flex-wrap:wrap;align-items:center;margin-top:.8rem" id="mRow">
+        <span style="font-size:.82rem;font-weight:700;color:var(--muted)">Model</span>
+        <button class="chip mchip on" data-m="rf">Random Forest</button>
+        <button class="chip mchip" data-m="lr">Logistic Regression</button>
+        <button class="chip mchip" data-m="dt">Decision Tree</button>
+        <span id="mNote" style="display:none;font-size:.82rem;color:var(--muted)">Five-year outlook uses the long-horizon Random Forest only.</span>
       </div>
       <div style="display:grid;grid-template-columns:300px 1fr;gap:2rem;margin-top:1.8rem" id="fWrap">
         <div><div id="fDonut" style="height:260px"></div><div id="fNote" class="explain"></div></div>
         <div class="tablewrap"><table id="fTable"></table></div>
       </div>
     </div>
-    <div class="explain rv d1" style="margin-top:1.6rem">ℹ️ <b>How good are these models?</b> On unseen years
-      (2021–2023) the best reach 96% accuracy — and <b>no high-risk country was ever misclassified as low-risk</b>,
-      the worst possible error for an early-warning system. Full methodology on the <a href="learn.html">Learn page</a>.</div>
+    <div class="explain rv d1" style="margin-top:1.6rem"><b>How good are these models?</b> On unseen years
+      the next-year models reach 96% accuracy and the five-year model 83% — and at both horizons
+      <b>no high-risk country was ever misclassified as low-risk</b>, the worst possible error for an
+      early-warning system. Full methodology on the <a href="learn.html">Learn page</a>.</div>
   </div>
 </section>
 
 <script>fwFooter()</script>
 <script>
-let fModel='rf';
-function fRows(){return ISOs.filter(i=>FW.PRED[i]).map(i=>({iso:i,n:FW.META[i].n,
- pou:FW.SERIES[i].pou[FW.SERIES[i].y.indexOf(2023)],...FW.PRED[i][fModel]}))
- .sort((a,b)=>(b.pH||0)-(a.pH||0));}
+let fModel='rf',fHorizon='1';
+function fRows(){
+ if(fHorizon==='5')return ISOs.filter(i=>FW.OUTLOOK[i]&&FW.OUTLOOK[i]['2028']).map(i=>({iso:i,n:FW.META[i].n,
+  pou:FW.SERIES[i].pou[FW.SERIES[i].y.indexOf(2023)],t:FW.OUTLOOK[i]['2028'].t,c:FW.OUTLOOK[i]['2028'].c,
+  pH:FW.OUTLOOK[i]['2028'].t==='High'?FW.OUTLOOK[i]['2028'].c:0}))
+  .sort((a,b)=>(b.pH||0)-(a.pH||0)||(b.c||0)-(a.c||0));
+ return ISOs.filter(i=>FW.PRED[i]).map(i=>({iso:i,n:FW.META[i].n,
+  pou:FW.SERIES[i].pou[FW.SERIES[i].y.indexOf(2023)],...FW.PRED[i][fModel]}))
+  .sort((a,b)=>(b.pH||0)-(a.pH||0));}
 function drawForecast(){const q=(document.getElementById('fSearch').value||'').toLowerCase();
+ const yr=fHorizon==='5'?'2028':'2024';
  const rows=fRows().filter(r=>r.n.toLowerCase().includes(q));
  const cnt={Low:0,Medium:0,High:0};fRows().forEach(r=>cnt[r.t]++);
  Plotly.react('fDonut',[{type:'pie',hole:.58,labels:TIERS,values:TIERS.map(t=>cnt[t]),
   marker:{colors:TIERS.map(t=>TC[t])},textinfo:'label+value'}],
   {...LAYOUT,showlegend:false,margin:{l:0,r:0,t:0,b:0},
    annotations:[{text:`<b>${fRows().length}</b><br>countries`,showarrow:false}]},PLOTCFG);
- document.getElementById('fNote').innerHTML=`💡 This model expects <b>${cnt.High} countries</b> in serious hunger in 2024.`;
+ document.getElementById('fNote').innerHTML=fHorizon==='5'
+  ?`The long-horizon model expects <b>${cnt.High} countries</b> in serious hunger by 2028. Five-year forecasts are less certain — test macro-F1 0.83 vs 0.96 for next-year.`
+  :`This model expects <b>${cnt.High} countries</b> in serious hunger in 2024.`;
  document.getElementById('fTable').innerHTML=
-  '<thead><tr><th>Country</th><th>Hunger today</th><th>2024 forecast</th><th>How sure?</th></tr></thead><tbody>'+
+  `<thead><tr><th>Country</th><th>Hunger today</th><th>${yr} forecast</th><th>How sure?</th></tr></thead><tbody>`+
   rows.map(r=>`<tr><td><b>${r.n}</b></td><td>${r.pou??'—'}%</td>
    <td><span class="badge" style="background:${TC[r.t]}">${r.t}</span></td>
    <td>${Math.round(r.c*100)}%</td></tr>`).join('')+'</tbody>';}
+function setHorizon(h){fHorizon=h;
+ document.querySelectorAll('.hchip').forEach(c=>c.classList.toggle('on',c.dataset.h===h));
+ const five=h==='5';
+ document.querySelectorAll('.mchip').forEach(c=>{
+  c.style.display=five?'none':'';
+  if(five){c.classList.toggle('on',c.dataset.m==='rf');}});
+ if(five)fModel='rf';
+ document.getElementById('mNote').style.display=five?'':'none';
+ drawForecast();}
+document.querySelectorAll('.hchip').forEach(ch=>ch.onclick=()=>setHorizon(ch.dataset.h));
 document.querySelectorAll('.mchip').forEach(ch=>ch.onclick=()=>{
  document.querySelectorAll('.mchip').forEach(c=>c.classList.remove('on'));
  ch.classList.add('on');fModel=ch.dataset.m;drawForecast();});
 document.getElementById('fSearch').oninput=drawForecast;
 document.getElementById('csvBtn').onclick=()=>{const rows=fRows();
- const csv='Country,HungerToday,Forecast2024,Confidence\n'+rows.map(r=>`"${r.n}",${r.pou},${r.t},${r.c}`).join('\n');
+ const yr=fHorizon==='5'?'2028':'2024';
+ const csv=`Country,HungerToday,Forecast${yr},Confidence\n`+rows.map(r=>`"${r.n}",${r.pou},${r.t},${r.c}`).join('\n');
  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
- a.download='foodwatch_forecast_2024.csv';a.click();};
+ a.download=`foodwatch_forecast_${yr}.csv`;a.click();};
 drawForecast();
 </script>
 </body>

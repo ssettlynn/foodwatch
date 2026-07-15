@@ -14,9 +14,9 @@
 <div class="pagehead">
   <div class="wrap">
     <div class="eyebrow" style="color:#FFD86B">Play With The Model</div>
-    <h1>🧪 The What-If Lab</h1>
-    <p>A real model, live in your browser. Start from a country's true 2023 situation,
-       drag the sliders, and watch its 2024 outlook change instantly.
+    <h1>The What-If Lab</h1>
+    <p>Two real models, live in your browser. Start from a country's true 2023 situation,
+       drag the sliders, and watch both its 2024 and 2028 outlooks change instantly.
        Try it: give a struggling country strong growth and low inflation — does its risk fall?</p>
   </div>
 </div>
@@ -31,18 +31,19 @@
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:0 2.6rem" id="wSliders"></div>
     </div>
 
-    <div style="display:grid;grid-template-columns:300px 1fr;gap:2rem;margin-top:2rem;align-items:center" id="wWrap">
-      <div class="card rv" style="text-align:center" id="wResult"></div>
-      <div class="card rv d1"><div id="wProbs" style="height:200px"></div></div>
+    <div style="display:grid;grid-template-columns:380px 1fr;gap:2rem;margin-top:2rem;align-items:center" id="wWrap">
+      <div class="card rv" id="wResult"></div>
+      <div class="card rv d1"><div id="wProbs" style="height:220px"></div></div>
     </div>
-    <div class="explain rv d2">⚠️ Educational scenario tool — a live Logistic Regression (our best model,
-      macro-F1 0.963) computed entirely in your browser. Real forecasts use verified data, not manual inputs.</div>
+    <div class="explain rv d2">Educational scenario tool — two live Logistic Regression models (next-year
+      macro-F1 0.93, five-year 0.81) computed entirely in your browser. The five-year outcome assumes the
+      conditions you set persist; real forecasts use verified data, not manual inputs.</div>
   </div>
 </section>
 
 <script>fwFooter()</script>
 <script>
-const LR=FW.LOGREG,WFEAT=LR.features;
+const LR=FW.LOGREG,LR5=FW.LOGREG5,WFEAT=LR.features;
 const wSel=document.getElementById('wCountry');
 ISOs.filter(i=>FW.PRED[i]).map(i=>FW.META[i].n).sort().forEach(n=>{
  const o=document.createElement('option');o.value=n;o.textContent=n;wSel.appendChild(o);});
@@ -63,21 +64,35 @@ function buildSliders(){const v=baseVals(),wrap=document.getElementById('wSlider
  Object.keys(RANGES).forEach(f=>{document.getElementById('s_'+f).oninput=e=>{
   document.getElementById('v_'+f).textContent=(+e.target.value).toFixed(1);predictWF();};});
  predictWF();}
+function softmax(model,x){
+ const z=x.map((v,i)=>(v-model.mean[i])/model.scale[i]);
+ const sc=model.coef.map((row,c)=>row.reduce((a,w,i)=>a+w*z[i],model.intercept[c]));
+ const mx=Math.max(...sc),ex=sc.map(s=>Math.exp(s-mx)),sum=ex.reduce((a,b)=>a+b,0);
+ const pr=ex.map(e=>e/sum);
+ return {pr,best:model.classes[pr.indexOf(Math.max(...pr))],
+         conf:Math.max(...pr),ord:TIERS.map(t=>pr[model.classes.indexOf(t)])};}
 function predictWF(){const x=WFEAT.map(f=>f==='covid_flag'?0:+document.getElementById('s_'+f).value);
- const z=x.map((v,i)=>(v-LR.mean[i])/LR.scale[i]);
- const sc=LR.coef.map((row,c)=>row.reduce((a,w,i)=>a+w*z[i],LR.intercept[c]));
- const mx=Math.max(...sc),ex=sc.map(s=>Math.exp(s-mx)),sum=ex.reduce((a,b)=>a+b,0),pr=ex.map(e=>e/sum);
- const best=LR.classes[pr.indexOf(Math.max(...pr))];
+ const r1=softmax(LR,x),r5=softmax(LR5,x);
  const realP=FW.PRED[name2iso[wSel.value]],real=realP?realP.lr.t:'?';
+ const cell=(label,r,note)=>
+  `<div style="flex:1;min-width:150px;text-align:center">
+    <div style="font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">${label}</div>
+    <div style="font-family:var(--serif);font-size:2.2rem;font-weight:700;color:${TC[r.best]}">${r.best}</div>
+    <div style="font-size:.82rem;color:var(--muted);line-height:1.5">${Math.round(r.conf*100)}% sure${note}</div>
+   </div>`;
  document.getElementById('wResult').innerHTML=
-  `<div style="font-size:.74rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">Your scenario → 2024</div>
-   <div style="font-family:var(--serif);font-size:2.6rem;font-weight:700;color:${TC[best]}">${best}</div>
-   <div style="font-size:.86rem;color:var(--muted);line-height:1.6">${MEAN[best]}<br>${Math.round(Math.max(...pr)*100)}% sure ·
-   ${best===real?'same as the real forecast':'<b style=color:#D64550>changed from the real forecast ('+real+')!</b>'}</div>`;
- const ord=TIERS.map(t=>pr[LR.classes.indexOf(t)]);
- Plotly.react('wProbs',[{type:'bar',orientation:'h',y:TIERS,x:ord,
-  marker:{color:TIERS.map(t=>TC[t])},text:ord.map(p=>Math.round(p*100)+'%'),textposition:'outside'}],
-  {...LAYOUT,xaxis:{range:[0,1.15],showgrid:false},margin:{l:76,r:36,t:8,b:24}},PLOTCFG);}
+  `<div style="display:flex;gap:.6rem;flex-wrap:wrap">
+    ${cell('Your scenario → 2024',r1,r1.best===real?'<br>same as the real forecast':'<br><b style=color:#D64550>changed from the real forecast ('+real+')</b>')}
+    <div style="width:1px;background:var(--line,#E4EAF0)"></div>
+    ${cell('If it persists → 2028',r5,r5.best===r1.best?'<br>holds over five years':'<br><b>drifts to '+r5.best+' longer-term</b>')}
+   </div>`;
+ Plotly.react('wProbs',[
+  {type:'bar',orientation:'h',y:TIERS,x:r1.ord,name:'2024',
+   marker:{color:TIERS.map(t=>TC[t])},text:r1.ord.map(p=>Math.round(p*100)+'%'),textposition:'outside'},
+  {type:'bar',orientation:'h',y:TIERS,x:r5.ord,name:'2028',
+   marker:{color:TIERS.map(t=>TC[t]),opacity:.45},text:r5.ord.map(p=>Math.round(p*100)+'%'),textposition:'outside'}],
+  {...LAYOUT,barmode:'group',xaxis:{range:[0,1.18],showgrid:false},
+   legend:{orientation:'h',y:1.25},margin:{l:76,r:36,t:8,b:24}},PLOTCFG);}
 wSel.onchange=buildSliders;
 document.getElementById('wReset').onclick=buildSliders;
 buildSliders();

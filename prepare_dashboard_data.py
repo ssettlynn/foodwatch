@@ -195,19 +195,22 @@ RULES = [{'ant': x['ant'], 'con': x['con'], 'lift': round(x['lift'], 2),
          for _, x in rr[rr['con'].isin(['HUNGER_HIGH', 'HUNGER_LOW'])]
                       .sort_values('lift', ascending=False).head(8).iterrows()]
 
-lr = joblib.load(os.path.join(MODELS, 'logreg_1yr.pkl'))
-LOGREG = {'features': CF,
- 'medians': [float(v) for v in lr.named_steps['imp'].statistics_],
- 'mean':    [float(v) for v in lr.named_steps['sc'].mean_],
- 'scale':   [float(v) for v in lr.named_steps['sc'].scale_],
- 'coef':    [[float(c) for c in row] for row in lr.named_steps['clf'].coef_],
- 'intercept': [float(v) for v in lr.named_steps['clf'].intercept_],
- 'classes': list(lr.named_steps['clf'].classes_)}
+def export_logreg(fn):
+    lr = joblib.load(os.path.join(MODELS, fn))
+    return {'features': CF,
+        'medians': [float(v) for v in lr.named_steps['imp'].statistics_],
+        'mean':    [float(v) for v in lr.named_steps['sc'].mean_],
+        'scale':   [float(v) for v in lr.named_steps['sc'].scale_],
+        'coef':    [[float(c) for c in row] for row in lr.named_steps['clf'].coef_],
+        'intercept': [float(v) for v in lr.named_steps['clf'].intercept_],
+        'classes': list(lr.named_steps['clf'].classes_)}
+LOGREG  = export_logreg('logreg_1yr.pkl')   # in-browser what-if, 1-year outcome
+LOGREG5 = export_logreg('logreg_5yr.pkl')   # in-browser what-if, 5-year outcome
 
 FW = {'SERIES': SERIES, 'META': META, 'GLOB': GLOB, 'PRED': PRED,
       'OUTLOOK': OUTLOOK, 'FORE': FORE, 'FCMETRICS': FCMETRICS,
       'SHAP': SHAP, 'METRICS': METRICS, 'TASKS': TASKS, 'RULES': RULES,
-      'LOGREG': LOGREG,
+      'LOGREG': LOGREG, 'LOGREG5': LOGREG5,
       'NICE': {'pou': 'Hunger level', 'des_adequacy': 'Food supply adequacy',
                'cereal_import_dep': 'Import dependence', 'food_prod_var': 'Supply stability',
                'gdp_per_capita': 'Income per person', 'gdp_growth': 'Economic growth',

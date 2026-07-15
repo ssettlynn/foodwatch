@@ -23,18 +23,21 @@
 <section>
   <div class="wrap">
     <div class="card rv">
-      <div style="display:flex;gap:1.6rem;align-items:center;flex-wrap:wrap">
-        <b style="font-family:var(--serif);font-size:1.7rem" id="mapYearLab">2023</b>
+      <div style="display:flex;gap:.8rem;align-items:center;flex-wrap:wrap">
+        <button class="chip modechip on" data-mode="hist">History 2010–2023</button>
+        <button class="chip modechip" data-mode="fore">2028 forecast</button>
+        <b style="font-family:var(--serif);font-size:1.7rem;margin-left:.8rem" id="mapYearLab">2023</b>
         <input type="range" id="mapYear" min="2010" max="2023" value="2023" style="flex:1;min-width:240px">
         <button class="chip" id="playBtn">▶ Play</button>
       </div>
       <div class="kgrid" id="mapKpis"></div>
       <div id="worldMap" style="height:500px"></div>
-      <div class="explain">💡 <b>How to read it:</b>
+      <div class="explain"><b>How to read it:</b>
         <span style="color:var(--teal)"><b>green = secure</b></span> (hunger under 5%),
         <span style="color:var(--amber)"><b>amber = vulnerable</b></span> (5–15%),
         <span style="color:var(--red)"><b>red = serious hunger</b></span> (over 15%).
-        Hover any country, then open its full story on the <a href="country.html">Country page</a>.</div>
+        Hover any country, then open its full story on the <a href="country.html">Country page</a>.
+        Switch to <b>2028 forecast</b> to see where the long-horizon model expects each country to be in five years.</div>
     </div>
   </div>
 </section>
@@ -65,25 +68,46 @@
 
 <script>fwFooter()</script>
 <script>
+let mapMode='hist';
 function yearData(y){const iso=[],z=[],txt=[],pou=[];
  ISOs.forEach(c=>{const s=FW.SERIES[c],i=s.y.indexOf(y);
   if(i>-1&&s.tier[i]){iso.push(c);z.push(TIERS.indexOf(s.tier[i]));
    txt.push(`<b>${FW.META[c].n}</b><br>Hunger: ${s.pou[i]}%<br>Tier: ${s.tier[i]}`);pou.push(s.pou[i]);}});
  return{iso,z,txt,pou};}
-function drawMap(y){const d=yearData(y);
+function foreData(){const iso=[],z=[],txt=[];
+ ISOs.forEach(c=>{const o=FW.OUTLOOK[c]&&FW.OUTLOOK[c]['2028'];if(!o)return;
+  iso.push(c);z.push(TIERS.indexOf(o.t));
+  txt.push(`<b>${FW.META[c].n}</b><br>2028 forecast: ${o.t}<br>Model confidence: ${Math.round(o.c*100)}%`);});
+ return{iso,z,txt};}
+function renderMap(d){
  Plotly.react('worldMap',[{type:'choropleth',locations:d.iso,z:d.z,text:d.txt,hoverinfo:'text',
   zmin:0,zmax:2,colorscale:[[0,TC.Low],[.5,TC.Medium],[1,TC.High]],showscale:false,
   marker:{line:{color:'#fff',width:.5}}}],
   {...LAYOUT,geo:{projection:{type:'natural earth'},showframe:false,landcolor:'#E8EDF2',bgcolor:'rgba(0,0,0,0)'},
-   margin:{l:0,r:0,t:0,b:0}},PLOTCFG);
- const hi=d.z.filter(v=>v===2).length;
+   margin:{l:0,r:0,t:0,b:0}},PLOTCFG);}
+function drawMap(y){const d=yearData(y);renderMap(d);
  document.getElementById('mapKpis').innerHTML=
-  `<div class="kpi"><div class="n" style="color:${TC.High}">${hi}</div><div class="l">serious hunger</div></div>
+  `<div class="kpi"><div class="n" style="color:${TC.High}">${d.z.filter(v=>v===2).length}</div><div class="l">serious hunger</div></div>
    <div class="kpi"><div class="n" style="color:${TC.Medium}">${d.z.filter(v=>v===1).length}</div><div class="l">vulnerable</div></div>
    <div class="kpi"><div class="n" style="color:${TC.Low}">${d.z.filter(v=>v===0).length}</div><div class="l">food-secure</div></div>
    <div class="kpi"><div class="n">${(d.pou.reduce((a,b)=>a+b,0)/d.pou.length).toFixed(1)}%</div><div class="l">average hunger</div></div>`;}
+function drawForeMap(){const d=foreData();renderMap(d);
+ document.getElementById('mapKpis').innerHTML=
+  `<div class="kpi"><div class="n" style="color:${TC.High}">${d.z.filter(v=>v===2).length}</div><div class="l">serious hunger by 2028</div></div>
+   <div class="kpi"><div class="n" style="color:${TC.Medium}">${d.z.filter(v=>v===1).length}</div><div class="l">vulnerable by 2028</div></div>
+   <div class="kpi"><div class="n" style="color:${TC.Low}">${d.z.filter(v=>v===0).length}</div><div class="l">food-secure by 2028</div></div>
+   <div class="kpi"><div class="n">${d.iso.length}</div><div class="l">countries forecast</div></div>`;}
 const yEl=document.getElementById('mapYear');
 yEl.oninput=()=>{document.getElementById('mapYearLab').textContent=yEl.value;drawMap(+yEl.value);};
+function setMode(mode){mapMode=mode;
+ document.querySelectorAll('.modechip').forEach(c=>c.classList.toggle('on',c.dataset.mode===mode));
+ const fore=mode==='fore';
+ yEl.disabled=fore;yEl.style.opacity=fore?.35:1;
+ document.getElementById('playBtn').style.display=fore?'none':'';
+ if(fore){if(playing){clearInterval(playing);playing=null;document.getElementById('playBtn').textContent='▶ Play';}
+  document.getElementById('mapYearLab').textContent='2028';drawForeMap();}
+ else{document.getElementById('mapYearLab').textContent=yEl.value;drawMap(+yEl.value);}}
+document.querySelectorAll('.modechip').forEach(ch=>ch.onclick=()=>setMode(ch.dataset.mode));
 drawMap(2023);
 let playing=null;
 document.getElementById('playBtn').onclick=function(){
