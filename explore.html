@@ -46,8 +46,9 @@
   <div class="wrap">
     <div class="center rv">
       <div class="eyebrow">The Big Patterns</div>
-      <h2>Four charts that explain global hunger</h2>
-      <p>All interactive — hover for details, click legends to hide and show.</p>
+      <h2>Six charts that explain global hunger</h2>
+      <p>The descriptive analysis behind the models — the same story the notebook's EDA tells.
+         All interactive: hover for details, click legends to hide and show.</p>
     </div>
     <div class="grid2">
       <div class="chartbox rv"><h3><span class="cnum">1</span>The world was winning — then 2020 happened</h3>
@@ -62,6 +63,12 @@
       <div class="chartbox rv d3"><h3><span class="cnum">4</span>Money matters — until it doesn't</h3>
         <div id="chScatter" style="height:300px"></div>
         <div class="explain">Each dot is a country (2023). Income cuts hunger fast among the poor, then the effect flattens.</div></div>
+      <div class="chartbox rv"><h3><span class="cnum">5</span>Which signals move with hunger</h3>
+        <div id="chCorr" style="height:340px"></div>
+        <div class="explain">Correlation across every country-year. Food-supply adequacy is the strongest partner of hunger (blue = moves together, red = moves opposite). No two inputs are near-identical, so nothing is redundant.</div></div>
+      <div class="chartbox rv d1"><h3><span class="cnum">6</span>Importing food isn't the problem</h3>
+        <div id="chImport" style="height:340px"></div>
+        <div class="explain">Grouping countries by how much cereal they import shows no clear hunger trend — a genuine null result. The Model Lab's association rules explain why: wealthy import-dependent countries stay food-secure.</div></div>
     </div>
   </div>
 </section>
@@ -142,6 +149,45 @@ Plotly.newPlot('chIncome',[{x:incOrder,y:incOrder.map(k=>FW.GLOB.income_2023[k])
  Plotly.newPlot('chScatter',TIERS.map(t=>({x:xs[t],y:ys[t],text:ts[t],mode:'markers',name:t,
   marker:{color:TC[t],size:8,opacity:.75},hovertemplate:'<b>%{text}</b><br>$%{x:,.0f} · %{y}%<extra></extra>'})),
   {...LAYOUT,xaxis:{type:'log',title:'income per person (log)'},yaxis:{title:'hunger %'}},PLOTCFG);})();
+
+// ---- Chart 5: correlation heatmap (notebook 04 EDA) ----
+(()=>{const FEATS=['pou','des_adequacy','cereal_import_dep','food_prod_var',
+  'gdp_per_capita','gdp_growth','inflation_cpi','pop_growth'];
+ const FLAB={pou:'Hunger',des_adequacy:'Food supply',cereal_import_dep:'Import dep.',
+  food_prod_var:'Supply var.',gdp_per_capita:'Income',gdp_growth:'Growth',
+  inflation_cpi:'Inflation',pop_growth:'Pop. growth'};
+ // stack every country-year into feature columns
+ const col={};FEATS.forEach(f=>col[f]=[]);
+ ISOs.forEach(c=>{const s=FW.SERIES[c];s.y.forEach((_,i)=>FEATS.forEach(f=>col[f].push(s[f]?s[f][i]:null)));});
+ const pear=(a,b)=>{let n=0,sa=0,sb=0,saa=0,sbb=0,sab=0;
+  for(let i=0;i<a.length;i++){const x=a[i],y=b[i];if(x==null||y==null)continue;
+   n++;sa+=x;sb+=y;saa+=x*x;sbb+=y*y;sab+=x*y;}
+  if(n<3)return 0;const cov=sab-sa*sb/n,va=saa-sa*sa/n,vb=sbb-sb*sb/n;
+  return (va<=0||vb<=0)?0:cov/Math.sqrt(va*vb);};
+ const z=FEATS.map(a=>FEATS.map(b=>+pear(col[a],col[b]).toFixed(2)));
+ const lab=FEATS.map(f=>FLAB[f]);
+ Plotly.newPlot('chCorr',[{type:'heatmap',z:z,x:lab,y:lab,zmin:-1,zmax:1,
+  colorscale:[[0,'#D64550'],[.5,'#F4F7FA'],[1,'#0F5FA8']],
+  text:z,texttemplate:'%{text}',textfont:{size:9},hoverinfo:'x+y+z'}],
+  {...LAYOUT,margin:{l:86,r:10,t:10,b:70},xaxis:{tickfont:{size:9},tickangle:-40},
+   yaxis:{tickfont:{size:9},autorange:'reversed'}},PLOTCFG);})();
+
+// ---- Chart 6: import-dependency null finding (notebook 04 EDA, chart 13) ----
+(()=>{const pts=[];
+ ISOs.forEach(c=>{const s=FW.SERIES[c];s.y.forEach((_,i)=>{
+  const d=s.cereal_import_dep&&s.cereal_import_dep[i],p=s.pou&&s.pou[i];
+  if(d!=null&&p!=null)pts.push([d,p]);});});
+ const deps=pts.map(p=>p[0]).sort((a,b)=>a-b);
+ const q=k=>deps[Math.floor(k*(deps.length-1))];
+ const cut=[q(.25),q(.5),q(.75)];
+ const bins=[[],[],[],[]];
+ pts.forEach(([d,p])=>{const b=d<cut[0]?0:d<cut[1]?1:d<cut[2]?2:3;bins[b].push(p);});
+ const names=['Q1 (least import)','Q2','Q3','Q4 (most import)'];
+ const cols=['#1A9E77','#8FB98A','#E6A817','#0F5FA8'];
+ Plotly.newPlot('chImport',bins.map((b,i)=>({type:'box',y:b,name:names[i],
+  marker:{color:cols[i]},boxpoints:false})),
+  {...LAYOUT,showlegend:false,yaxis:{title:'hunger %'},
+   margin:{l:52,r:10,t:10,b:56}},PLOTCFG);})();
 </script>
 </body>
 </html>

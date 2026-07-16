@@ -64,7 +64,7 @@ all preprocessing inside scikit-learn Pipelines (fit on train only).
 |---|---|:---:|:---:|:---:|
 | **Risk tier** | Classification (3-class) | macro-F1 | **0.958** | 0.957 |
 | **Hunger level** | Regression | MAE (pp) | **0.49** | 0.52 |
-| **Risk direction** | Classification (3-class) | macro-F1 | **0.645** | acc 0.70 |
+| **Risk direction** | Classification (3-class) | macro-F1 | **0.625** | acc 0.725 |
 
 Predicting the *level* is easy (hunger is autocorrelated); predicting the *direction of change* is the genuinely
 hard early-warning question — and we report it honestly.
