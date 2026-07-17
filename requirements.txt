@@ -1,7 +1,15 @@
-streamlit
+# FoodWatch pipeline dependencies
+# (the website itself is static and needs none of these — browser only)
+
+# data + modeling (notebooks/FW.ipynb, prepare_dashboard_data.py)
 pandas
 numpy
-plotly
-scikit-learn==1.6.1
-shap
+scikit-learn==1.6.1   # must match the version the .pkl models were trained with
 joblib
+shap
+mlxtend               # Apriori association mining
+matplotlib            # EDA / evaluation figures
+
+# data collection (notebook section 01)
+requests
+country_converter     # FAOSTAT country names -> ISO3

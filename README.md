@@ -6,7 +6,7 @@
 
 Predicting where national hunger is heading — from open UN & World Bank data, with machine learning you can actually understand.
 
-[![Live Demo](https://img.shields.io/badge/▶_Live_Demo-GitHub_Pages-1A9E77?style=for-the-badge)](https://YOUR_USERNAME.github.io/foodwatch/)
+[![Live Demo](https://img.shields.io/badge/▶_Live_Demo-GitHub_Pages-1A9E77?style=for-the-badge)](https://ssettlynn.github.io/foodwatch/)
 
 ![status](https://img.shields.io/badge/status-active-1A9E77)
 ![data](https://img.shields.io/badge/data-FAOSTAT_+_World_Bank-0F5FA8)
@@ -55,6 +55,25 @@ Models are evaluated on a **chronological hold-out test set** (data never seen d
 **Headline finding:** across every model and both horizons, **no high-risk country was ever misclassified
 as low-risk** — the worst possible error for an early-warning system never occurred on the test data.
 
+<table>
+<tr>
+<td width="50%"><img src="assets/figures/07_global_pou_trend.png" alt="Global undernourishment trend with COVID and price-shock markers"></td>
+<td width="50%"><img src="assets/figures/16_shap_global.png" alt="SHAP global feature importance, 1-year vs 5-year"></td>
+</tr>
+<tr>
+<td align="center"><sub>A decade of progress, reversed by two shocks (notebook 04)</sub></td>
+<td align="center"><sub>What drives risk — and how it shifts with horizon (notebook 07)</sub></td>
+</tr>
+<tr>
+<td width="50%"><img src="assets/figures/15_confusion_matrix_rf.png" alt="Random Forest confusion matrices — zero High-to-Low errors"></td>
+<td width="50%"><img src="assets/figures/05_correlation_heatmap.png" alt="Correlation heatmap of the ten input signals"></td>
+</tr>
+<tr>
+<td align="center"><sub>Zero High→Low errors on both horizons (notebook 06)</sub></td>
+<td align="center"><sub>Which signals move with hunger (notebook 04)</sub></td>
+</tr>
+</table>
+
 **Leakage prevention:** chronological train/validation/test split · GroupKFold by country for tuning ·
 all preprocessing inside scikit-learn Pipelines (fit on train only).
 
@@ -94,7 +113,7 @@ documented limit on what forecasting can claim.
 ## 🚀 Run locally
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/foodwatch.git
+git clone https://github.com/ssettlynn/foodwatch.git
 cd foodwatch
 python3 -m http.server 8000
 # then open http://localhost:8000
@@ -102,11 +121,10 @@ python3 -m http.server 8000
 
 Or just double-click `index.html` — the site has zero dependencies beyond a browser.
 
-## 🌐 Deploy (free, on GitHub Pages)
+## 🌐 Live site
 
-1. Push this repo to GitHub.
-2. **Settings → Pages → Source: _Deploy from a branch_ → `main` / `(root)` → Save.**
-3. Live in ~2 minutes at `https://YOUR_USERNAME.github.io/foodwatch/`.
+Deployed with GitHub Pages from this repository (`main` / root):
+**https://ssettlynn.github.io/foodwatch/**
 
 ## 🧱 Tech stack
 
@@ -116,21 +134,32 @@ Or just double-click `index.html` — the site has zero dependencies beyond a br
 
 ```
 foodwatch/
-├── index.html           # Home
-├── explore.html         # World map + patterns
-├── country.html         # Country stories + 2024–2028 outlook
-├── forecast.html        # Multi-model forecast center
-├── modellab.html        # Metrics, overfitting, SHAP, association rules
-├── lab.html             # In-browser what-if simulator
-├── learn.html           # Methodology, sources, FAQ
-├── style.css            # Shared design system
-├── fw.js                # Shared JS (nav, constants, animations)
-├── foodwatch_data.js    # Data + exported model parameters (generated)
+├── index.html                 # Home
+├── explore.html               # World map (+2028 layer) + six EDA patterns
+├── country.html               # Country stories + indicator-aligned 2024/2028 outlook
+├── forecast.html              # Horizon toggle, 163-country table, indicator tiles
+├── modellab.html              # Three tasks, metrics, overfitting, SHAP, rules
+├── lab.html                   # In-browser what-if simulator (2024 + 2028)
+├── learn.html                 # Methodology, sources, FAQ
+├── style.css / fw.js          # Shared design system + JS (nav, icons, charts theme)
+├── foodwatch_data.js          # Generated: data + model parameters (15 keys)
 ├── prepare_dashboard_data.py  # Regenerates foodwatch_data.js from models + CSVs
-├── plotly.min.js        # Charting library (vendored, offline)
-├── assets/              # Hand-crafted SVG artwork + figures
-└── notebooks/           # KDD pipeline (01 collect → 08 indicator forecasting)
+├── plotly.min.js              # Charting library (vendored, offline)
+├── notebooks/FW.ipynb         # Full KDD pipeline (01 collect → 08 forecasting), run on Colab
+├── data/processed/            # Master panel + model-ready datasets (5 CSVs + metrics)
+├── models/                    # Trained classifiers (LogReg / Tree / RF × 2 horizons)
+├── reports/                   # Figures + evaluation tables from the notebook
+└── assets/                    # Hand-crafted SVG artwork + pipeline figures
 ```
+
+## 🔁 Reproduce the pipeline
+
+1. Open `notebooks/FW.ipynb` in Google Colab and run top-to-bottom (sections 01–08).
+   It downloads the raw FAOSTAT / World Bank CSVs, builds the datasets in `data/processed/`,
+   trains the models in `models/`, and saves every figure.
+2. Regenerate the site data: `pip install -r requirements.txt && python3 prepare_dashboard_data.py`
+   → rewrites `foodwatch_data.js` (~0.3 MB). The site itself needs no build step.
+
 
 ## 🔬 Methodology
 
@@ -149,5 +178,5 @@ runs a Logistic Regression **live in the browser** (softmax in JS, verified to m
 [MIT](LICENSE) · Data © FAO / World Bank under their respective open-data terms.
 
 <div align="center">
-<sub>Academic Data Mining project · 2026 · Open data · Built to be understood, not just accurate.</sub>
+<sub>Academic Data Mining project · Soe Sett Lynn · 2026 · Open data · Built to be understood, not just accurate.</sub>
 </div>

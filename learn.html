@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Learn — FoodWatch</title>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <script src="foodwatch_data.js"></script>
@@ -91,9 +92,16 @@
       <details><summary>Is the data up to date?</summary>
         <p>FAO releases finalized data with a 1–2 year lag, so the panel ends in 2023 and forecasts 2024. The pipeline
         is fully retrainable: when new data drops, one script refresh updates everything.</p></details>
-      <details><summary>What are the "trend" arrows on country pages?</summary>
-        <p>Simple 5-year linear projections for income, inflation and growth — clearly labelled as direction guides,
-        not machine-learning forecasts. The tier prediction itself comes from the trained models.</p></details>
+      <details><summary>Where do the 2024 and 2028 indicator forecasts come from?</summary>
+        <p>From trained Random Forest regression models — one per indicator per horizon, using the same
+        leakage-safe chronological splits as the tier models. Slow-moving indicators (hunger, income, food supply)
+        are reliable (R&sup2; 0.87–0.99 on unseen years); volatile ones are flagged honestly — inflation cannot be
+        forecast five years ahead, and the site says so.</p></details>
+      <details><summary>Can the model predict whether things will get better or worse?</summary>
+        <p>That is the hardest question, and we test it directly: a third task predicts the <b>direction</b> of change
+        (improving / stable / worsening). It beats the naive baseline but scores far below the tier task —
+        proof that predicting <i>change</i> is much harder than predicting <i>level</i>, which is exactly why
+        early warning is difficult.</p></details>
     </div>
   </div>
 </section>
